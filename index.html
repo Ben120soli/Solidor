@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+  <meta name="theme-color" content="#1a3a2a"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-title" content="Solidor Immo"/>
+  <title>Solidor Immo</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    body{font-family:Georgia,'Book Antiqua',Palatino,serif;background:#f5f2ed;min-height:100vh}
+    button{cursor:pointer;border:none;font-family:inherit}
+    input,select,textarea{font-family:inherit}
+    ::-webkit-scrollbar{display:none}
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useMemo, useRef } = React;
+
+const C = {
+  forest:"#1a3a2a", forestLight:"#2d5c42", forestDim:"#a8c4b2",
+  cream:"#f5f2ed", cream2:"#ede8e0", parchment:"#faf9f7",
+  ink:"#2d2820", inkLight:"#5a4e42", inkDim:"#8a7968", inkFaint:"#a89a88",
+  gold:"#b8930a", goldBg:"#fffdf0", border:"#ddd8cf",
+  red:"#c0392b", redBg:"#fdf2f2", redBorder:"#f8c6c6",
+  green:"#155724", greenBg:"#d4edda", greenDot:"#28a745",
+  amber:"#856404", amberBg:"#fff3cd", amberDot:"#ffc107",
+  blue:"#1a3a6a", blueBg:"#e8effa", blueDot:"#2563eb",
+  purple:"#6a1b9a", purpleBg:"#f3e5f5", purpleDot:"#8e24aa",
+};
+
+const STATUT_PROP = {
+  "loué":   {bg:C.greenBg, text:C.green, dot:C.greenDot, label:"Loué"},
+  "vacant": {bg:C.amberBg, text:C.amber, dot:C.amberDot, label:"Vacant"},
+  "travaux":{bg:C.redBg,   text:C.red,   dot:"#dc3545",  label:"Travaux"},
+};
+const STATUT_LOYER = {
+  "payé":   {bg:C.greenBg, text:C.green, dot:C.greenDot, label:"Payé"},
+  "attendu":{bg:C.blueBg,  text:C.blue,  dot:C.blueDot,  label:"Attendu"},
+  "retard": {bg:C.amberBg, text:C.amber, dot:C.amberDot, label:"En retard"},
+  "impayé": {bg:C.redBg,   text:C.red,   dot:"#dc3545",  label:"Impayé"},
+};
+const STATUT_COURRIER = {
+  "planifié": {bg:C.blueBg,   text:C.blue,   dot:C.blueDot},
+  "envoyé":   {bg:C.greenBg,  text:C.green,  dot:C.greenDot},
+  "en_cours": {bg:C.amberBg,  text:C.amber,  dot:C.amberDot},
+  "classé":   {bg:C.purpleBg, text:C.purple, dot:C.purpleDot},
+};
+const TYPE_TRAVAUX = {
+  "entretien":{color:C.blue,   bg:C.blueBg,   label:"Entretien"},
+  "travaux":  {color:C.red,    bg:C.redBg,    label:"Travaux"},
+  "urgence":  {color:C.amber,  bg:C.amberBg,  label:"Urgence"},
+  "syndic":   {color:C.purple, bg:C.purpleBg, label:"Syndic"},
+};
+const TYPE_COURRIER = {
+  "relance":"Relance","mise_en_demeure":"Mise en demeure",
+  "commandement":"Commandement de payer","congé":"Congé donné","autre":"Autre",
+};
+const MAIL_TAGS = ["loyer","travaux","syndic","locataire","procédure","autre"];
+
+const SEED = {
+  properties:[
+    {id:1,nom:"Appt Haussmannien",adresse:"12 Rue de Rivoli, 75001 Paris",type:"Appartement",surface:78,image:"🏛️",statut:"loué",loyer:1850,charges:220,caution:3700,notes:"Parquet ancien, double vitrage refait 2022.",
+     locataire:{nom:"Marie Dupont",email:"marie.dupont@email.fr",tel:"06 12 34 56 78",dateEntree:"2023-03-01"},
+     syndic:{nom:"Syndic Rivoli",contact:"contact@syndic-rivoli.fr",tel:"01 40 00 11 22",cotisation:180}},
+    {id:2,nom:"Studio Montmartre",adresse:"7 Rue Lepic, 75018 Paris",type:"Studio",surface:28,image:"🏠",statut:"vacant",loyer:890,charges:80,caution:0,notes:"Travaux peinture prévus juillet.",locataire:null,syndic:null},
+  ],
+  loyers:[
+    {id:1,propId:1,mois:"2024-05",montant:2070,statut:"payé",datePaiement:"2024-05-03",notes:""},
+    {id:2,propId:1,mois:"2024-06",montant:2070,statut:"payé",datePaiement:"2024-06-02",notes:""},
+    {id:3,propId:1,mois:"2024-07",montant:2070,statut:"retard",datePaiement:"",notes:"Relance envoyée le 10/07"},
+    {id:4,propId:1,mois:"2024-08",montant:2070,statut:"impayé",datePaiement:"",notes:""},
+  ],
+  travaux:[
+    {id:1,propId:1,date:"2024-02-15",type:"entretien",desc:"Révision chaudière",montant:280,prestataire:"Thermix SAS",statut:"terminé"},
+    {id:2,propId:1,date:"2024-05-20",type:"travaux",desc:"Remplacement robinetterie",montant:650,prestataire:"Plomberie Martin",statut:"terminé"},
+    {id:3,propId:2,date:"2024-07-01",type:"travaux",desc:"Peinture complète",montant:1200,prestataire:"À définir",statut:"planifié"},
+  ],
+  courriers:[
+    {id:1,propId:1,date:"2024-07-10",type:"relance",titre:"1ère relance loyer juillet",destinataire:"Marie Dupont",statut:"envoyé",notes:"Envoi email + RAR"},
+    {id:2,propId:1,date:"2024-07-25",type:"mise_en_demeure",titre:"Mise en demeure loyer juillet",destinataire:"Marie Dupont",statut:"envoyé",notes:"AR reçu le 28/07"},
+    {id:3,propId:1,date:"2024-08-05",type:"commandement",titre:"Commandement de payer",destinataire:"Marie Dupont",statut:"en_cours",notes:"Huissier mandaté"},
+  ],
+  mails:[
+    {id:1,propId:1,date:"2024-07-10",objet:"Retard paiement loyer juillet",de:"moi",a:"marie.dupont@email.fr",corps:"Madame,\n\nNous n'avons pas reçu le paiement du loyer de juillet.\n\nCordialement",tag:"loyer",lu:true,aiTriage:true},
+    {id:2,propId:1,date:"2024-07-12",objet:"RE: Retard paiement loyer juillet",de:"marie.dupont@email.fr",a:"moi",corps:"Bonjour,\n\nJe vais régulariser cette semaine.\n\nMarie Dupont",tag:"loyer",lu:true,aiTriage:true},
+    {id:3,propId:1,date:"2024-08-01",objet:"Fuite robinetterie cuisine",de:"marie.dupont@email.fr",a:"moi",corps:"Bonjour,\n\nIl y a une petite fuite sous l'évier.\n\nMerci",tag:"travaux",lu:false,aiTriage:true},
+  ],
+};
+
+const fmt = n => new Intl.NumberFormat("fr-FR",{style:"currency",currency:"EUR",maximumFractionDigits:0}).format(n||0);
+const fmtDate = d => d ? new Date(d).toLocaleDateString("fr-FR") : "—";
+const moisLabel = m => { if(!m)return"—"; const[y,mo]=m.split("-"); return new Date(y,mo-1).toLocaleDateString("fr-FR",{month:"long",year:"numeric"}); };
+const cap = s => s ? s.charAt(0).toUpperCase()+s.slice(1) : "";
+
+function Badge({s={},children}){
+  return <span style={{background:s.bg||C.blueBg,color:s.text||C.blue,fontSize:".68rem",padding:".22rem .6rem",borderRadius:"2rem",fontWeight:600,display:"inline-flex",alignItems:"center",gap:3,whiteSpace:"nowrap"}}>
+    <span style={{width:5,height:5,borderRadius:"50%",background:s.dot||C.blueDot,flexShrink:0}}></span>{children}
+  </span>;
+}
+function Chip({color,bg,children}){
+  return <span style={{background:bg,color,fontSize:".68rem",padding:".18rem .55rem",borderRadius:"2rem",fontWeight:600,whiteSpace:"nowrap"}}>{children}</span>;
+}
+function Card({children,style={}}){
+  return <div style={{background:"#fff",borderRadius:"1rem",boxShadow:"0 2px 12px rgba(45,40,32,.08)",padding:"1rem",...style}}>{children}</div>;
+}
+function Empty({icon,text}){
+  return <div style={{textAlign:"center",padding:"1.5rem",color:C.inkFaint,fontSize:".85rem"}}><div style={{fontSize:"1.6rem",marginBottom:".3rem"}}>{icon}</div>{text}</div>;
+}
+function SectionHead({title,onAdd,addLabel="+ Ajouter"}){
+  return <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"1rem"}}>
+    <h3 style={{fontSize:".9rem",fontWeight:700,color:C.forest,margin:0}}>{title}</h3>
+    {onAdd&&<button onClick={onAdd} style={{background:C.forest,color:"#fff",border:"none",borderRadius:".55rem",padding:".38rem .8rem",fontSize:".75rem",cursor:"pointer"}}>{addLabel}</button>}
+  </div>;
+}
+
+const inputSt = {width:"100%",padding:".6rem .85rem",border:`1.5px solid ${C.border}`,borderRadius:".6rem",background:C.parchment,fontSize:".85rem",color:C.ink,outline:"none",boxSizing:"border-box"};
+
+function Modal({children,onClose,title}){
+  return <div style={{position:"fixed",inset:0,background:"rgba(10,18,35,.7)",zIndex:2000,display:"flex",alignItems:"flex-end",justifyContent:"center",backdropFilter:"blur(4px)"}} onClick={onClose}>
+    <div onClick={e=>e.stopPropagation()} style={{background:"#fff",borderRadius:"1.25rem 1.25rem 0 0",padding:"1.25rem 1.25rem 2rem",width:"100%",maxWidth:600,maxHeight:"90vh",overflowY:"auto",boxShadow:"0 -8px 40px rgba(0,0,0,.2)"}}>
+      <div style={{width:36,height:4,borderRadius:2,background:C.border,margin:"0 auto .9rem"}}></div>
+      {title&&<h2 style={{fontSize:"1rem",fontWeight:700,color:C.forest,marginBottom:"1.1rem",marginTop:0}}>{title}</h2>}
+      {children}
+    </div>
+  </div>;
+}
+
+function FormModal({title,fields,defaults={},onSave,onClose}){
+  const [f,setF]=useState({...defaults});
+  const set=(k,v)=>setF(p=>({...p,[k]:v}));
+  const valid=fields.filter(x=>x.req).every(x=>f[x.key]&&f[x.key]!=="");
+  return <Modal onClose={onClose} title={title}>
+    <div style={{display:"flex",flexDirection:"column",gap:".75rem"}}>
+      {fields.map(fd=>(
+        <div key={fd.key}>
+          <label style={{display:"block",fontSize:".7rem",color:C.inkDim,textTransform:"uppercase",letterSpacing:".06em",marginBottom:".28rem"}}>{fd.label}{fd.req?" *":""}</label>
+          {fd.type==="select"
+            ?<select style={inputSt} value={f[fd.key]||""} onChange={e=>set(fd.key,e.target.value)}>{fd.opts.map(([v,l])=><option key={v} value={v}>{l}</option>)}</select>
+            :fd.type==="textarea"
+            ?<textarea style={{...inputSt,resize:"vertical"}} rows={fd.rows||3} value={f[fd.key]||""} onChange={e=>set(fd.key,e.target.value)} placeholder={fd.placeholder||""}/>
+            :<input style={inputSt} type={fd.type||"text"} value={f[fd.key]||""} onChange={e=>set(fd.key,e.target.value)} placeholder={fd.placeholder||""}/>}
+        </div>
+      ))}
+    </div>
+    <div style={{display:"flex",gap:".65rem",marginTop:"1.25rem"}}>
+      <button onClick={onClose} style={{flex:1,background:C.cream2,color:C.inkLight,padding:".7rem",borderRadius:".75rem",fontSize:".88rem",border:"none",cursor:"pointer"}}>Annuler</button>
+      <button onClick={()=>valid&&onSave(f)} style={{flex:2,background:valid?C.forest:"#ccc",color:"#fff",padding:".7rem",borderRadius:".75rem",fontSize:".88rem",border:"none",cursor:valid?"pointer":"not-allowed",fontWeight:600}}>Enregistrer</button>
+    </div>
+  </Modal>;
+}
+
+function PropFormModal({initial={},onSave,onClose}){
+  const EMOJIS=["🏠","🏡","🏛️","🏢","🏬","🏗️","🏘️","🗝️"];
+  const blank={nom:"",adresse:"",type:"Appartement",surface:"",loyer:"",charges:"",caution:"",statut:"vacant",image:"🏠",notes:""};
+  const [f,setF]=useState({...blank,...initial});
+  const set=(k,v)=>setF(p=>({...p,[k]:v}));
+  const blankLoc={nom:"",email:"",tel:"",dateEntree:""};
+  const [loc,setLoc]=useState(initial.locataire||null);
+  const [showLoc,setShowLoc]=useState(!!initial.locataire);
+  const setLocF=(k,v)=>setLoc(p=>({...blankLoc,...p,[k]:v}));
+  const blankSyn={nom:"",contact:"",tel:"",cotisation:""};
+  const [syn,setSyn]=useState(initial.syndic||null);
+  const [showSyn,setShowSyn]=useState(!!initial.syndic);
+  const setSynF=(k,v)=>setSyn(p=>({...blankSyn,...p,[k]:v}));
+  function handleSave(){
+    if(!f.nom||!f.adresse)return;
+    onSave({...f,id:initial.id||Date.now(),surface:+f.surface||0,loyer:+f.loyer||0,charges:+f.charges||0,caution:+f.caution||0,
+      locataire:showLoc&&loc?.nom?loc:null,syndic:showSyn&&syn?.nom?syn:null});
+  }
+  const secSt={fontSize:".78rem",fontWeight:700,color:C.forest,textTransform:"uppercase",letterSpacing:".05em",margin:"1rem 0 .65rem",paddingTop:".85rem",borderTop:`1px solid ${C.border}`,display:"flex",alignItems:"center",gap:".5rem",cursor:"pointer"};
+  return <Modal onClose={onClose} title={initial.id?"Modifier le bien":"Nouveau bien"}>
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:".75rem"}}>
+      <div style={{gridColumn:"span 2"}}><label style={{display:"block",fontSize:".7rem",color:C.inkDim,textTransform:"uppercase",letterSpacing:".06em",marginBottom:".28rem"}}>Nom *</label><input style={inputSt} value={f.nom} onChange={e=>set("nom",e.target.value)} placeholder="Ex: Appt Centre-Ville"/></div>
+      <div style={{gridColumn:"span 2"}}><label style={{display:"block",fontSize:".7rem",color:C.inkDim,textTransform:"uppercase",letterSpacing:".06em",marginBottom:".28rem"}}>Adresse *</label><input style={inputSt} value={f.adresse} onChange={e=>set("adresse",e.target.value)} placeholder="Rue, CP, Ville"/></div>
+      <div><label style={{display:"block",fontSize:".7rem",color:C.inkDim,textTransform:"uppercase",letterSpacing:".06em",marginBottom:".28rem"}}>Type</label><select style={inputSt} value={f.type} onChange={e=>set("type",e.target.value)}>{["Appartement","Studio","Maison","Commerce","Parking"].map(t=><option key={t}>{t}</option>)}</select></div>
+      <div><label style={{display:"block",fontSize:".7rem",color:C.inkDim,textTransform:"uppercase",letterSpacing:".06em",marginBottom:".28rem"}}>Surface (m²)</label><input style={inputSt} type="number" value={f.surface} onChange={e=>set("surface",e.target.value)}/></div>
+      <div><label style={{display:"block",fontSize:".7rem",color:C.inkDim,textTransform:"uppercase",letterSpacing:".06em",marginBottom:".28rem"}}>Loyer HC (€)</label><input style={inputSt} type="number" value={f.loyer} onChange={e=>set("loyer",e.target.value)}/></div>
+      <div><label style={{display:"block",fontSize:".7rem",color:C.inkDim,textTransform:"uppercase",letterSpacing:".06em",marginBottom:".28rem"}}>Charges (€)</label><input style={inputSt} type="number" value={f.charges} onChange={e=>set("charges",e.target.value)}/></div>
+      <div><label style={{display:"block",fontSize:".7rem",color:C.inkDim,textTransform:"uppercase",letterSpacing:".06em",marginBottom:".28rem"}}>Caution (€)</label><input style={inputSt} type="number" value={f.caution} onChange={e=>set("caution",e.target.value)}/></div>
+      <div><label style={{display:"block",fontSize:".7rem",color:C.inkDim,textTransform:"uppercase",letterSpacing:".06em",marginBottom:".28rem"}}>Statut</label><select style={inputSt} value={f.statut} onChange={e=>set("statut",e.target.value)}><option value="loué">Loué</option><option value="vacant">Vacant</option><option value="travaux">Travaux</option></select></div>
+      <div style={{gridColumn:"span 2"}}><label style={{display:"block",fontSize:".7rem",color:C.inkDim,textTransform:"uppercase",letterSpacing:".06em",marginBottom:".28rem"}}>Icône</label><div style={{display:"flex",gap:".4rem",flexWrap:"wrap"}}>{EMOJIS.map(e=><button key={e} onClick={()=>set("image",e)} style={{width:36,height:36,fontSize:"1.1rem",borderRadius:".5rem",border:`2px solid ${f.image===e?C.forest:C.border}`,background:f.image===e?"#e8f4ed":C.parchment,cursor:"pointer"}}>{e}</button>)}</div></div>
+      <div style={{gridColumn:"span 2"}}><label style={{display:"block",fontSize:".7rem",color:C.inkDim,textTransform:"uppercase",letterSpacing:".06em",marginBottom:".28rem"}}>Notes</label><textarea style={{...inputSt,resize:"vertical"}} rows={2} value={f.notes} onChange={e=>set("notes",e.target.value)}/></div>
+    </div>
+    <div style={secSt} onClick={()=>setShowLoc(v=>!v)}>
+      <input type="checkbox" checked={showLoc} onChange={e=>setShowLoc(e.target.checked)} onClick={e=>e.stopPropagation()}/>
+      👤 Locataire {showLoc?"▲":"▼"}
+    </div>
+    {showLoc&&<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:".75rem"}}>
+      <div style={{gridColumn:"span 2"}}><label style={{display:"block",fontSize:".7rem",color:C.inkDim,textTransform:"uppercase",letterSpacing:".06em",marginBottom:".28rem"}}>Nom complet</label><input style={inputSt} value={loc?.nom||""} onChange={e=>setLocF("nom",e.target.value)}/></div>
+      <div><label style={{display:"block",fontSize:".7rem",color:C.inkDim,textTransform:"uppercase",letterSpacing:".06em",marginBottom:".28rem"}}>Email</label><input style={inputSt} type="email" value={loc?.email||""} onChange={e=>setLocF("email",e.target.value)}/></div>
+      <div><label style={{display:"block",fontSize:".7rem",color:C.inkDim,textTransform:"uppercase",letterSpacing:".06em",marginBottom:".28rem"}}>Téléphone</label><input style={inputSt} value={loc?.tel||""} onChange={e=>setLocF("tel",e.target.value)}/></div>
+      <div style={{gridColumn:"span 2"}}><label style={{display:"block",fontSize:".7rem",color:C.inkDim,textTransform:"uppercase",letterSpacing:".06em",marginBottom:".28rem"}}>Date d'entrée</label><input style={inputSt} type="date" value={loc?.dateEntree||""} onChange={e=>setLocF("dateEntree",e.target.value)}/></div>
+    </div>}
+    <div style={secSt} onClick={()=>setShowSyn(v=>!v)}>
+      <input type="checkbox" checked={showSyn} onChange={e=>setShowSyn(e.target.checked)} onClick={e=>e.stopPropagation()}/>
+      🏢 Syndic {showSyn?"▲":"▼"}
+    </div>
+    {showSyn&&<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:".75rem"}}>
+      <div style={{gridColumn:"span 2"}}><label style={{display:"block",fontSize:".7rem",color:C.inkDim,textTransform:"uppercase",letterSpacing:".06em",marginBottom:".28rem"}}>Nom du syndic</label><input style={inputSt} value={syn?.nom||""} onChange={e=>setSynF("nom",e.target.value)}/></div>
+      <div><label style={{display:"block",fontSize:".7rem",color:C.inkDim,textTransform:"uppercase",letterSpacing:".06em",marginBottom:".28rem"}}>Email contact</label><input style={inputSt} value={syn?.contact||""} onChange={e=>setSynF("contact",e.target.value)}/></div>
+      <div><label style={{display:"block",fontSize:".7rem",color:C.inkDim,textTransform:"uppercase",letterSpacing:".06em",marginBottom:".28rem"}}>Téléphone</label><input style={inputSt} value={syn?.tel||""} onChange={e=>setSynF("tel",e.target.value)}/></div>
+      <div style={{gridColumn:"span 2"}}><label style={{display:"block",fontSize:".7rem",color:C.inkDim,textTransform:"uppercase",letterSpacing:".06em",marginBottom:".28rem"}}>Cotisation €/mois</label><input style={inputSt} type="number" value={syn?.cotisation||""} onChange={e=>setSynF("cotisation",e.target.value)}/></div>
+    </div>}
+    <div style={{display:"flex",gap:".65rem",marginTop:"1.25rem"}}>
+      <button onClick={onClose} style={{flex:1,background:C.cream2,color:C.inkLight,padding:".7rem",borderRadius:".75rem",fontSize:".88rem",border:"none",cursor:"pointer"}}>Annuler</button>
+      <button onClick={handleSave} disabled={!f.nom||!f.adresse} style={{flex:2,background:f.nom&&f.adresse?C.forest:"#ccc",color:"#fff",padding:".7rem",borderRadius:".75rem",fontSize:".88rem",border:"none",cursor:"pointer",fontWeight:600}}>{initial.id?"Enregistrer":"Créer le bien"}</button>
+    </div>
+  </Modal>;
+}
+
+function AITriageModal({properties,onImport,onClose}){
+  const [step,setStep]=useState("intro");
+  const [src,setSrc]=useState("gmail");
+  const [progress,setProgress]=useState(0);
+  const [results,setResults]=useState([]);
+  const [selected,setSelected]=useState([]);
+  const timerRef=useRef(null);
+  const fakeEmails=[
+    {id:"e1",de:"marie.dupont@email.fr",objet:"Question sur les charges de septembre",corps:"Bonjour, je souhaitais avoir des précisions sur les charges...",dateRaw:"2024-08-15",tag:"loyer",propId:1,confidence:97,raison:"Expéditeur = locataire"},
+    {id:"e2",de:"contact@syndic-rivoli.fr",objet:"Convocation AG du 15 octobre",corps:"Vous êtes convoqué à l'assemblée générale...",dateRaw:"2024-08-10",tag:"syndic",propId:1,confidence:99,raison:"Expéditeur = syndic"},
+    {id:"e3",de:"plomberie-martin@gmail.com",objet:"Devis réparation fuite cuisine",corps:"Suite à votre demande, veuillez trouver le devis...",dateRaw:"2024-08-12",tag:"travaux",propId:1,confidence:94,raison:"Mot-clé : devis, fuite"},
+    {id:"e4",de:"impots@dgfip.gouv.fr",objet:"Avis de taxe foncière 2024",corps:"Votre avis de taxe foncière est disponible...",dateRaw:"2024-08-08",tag:"autre",propId:null,confidence:88,raison:"Mot-clé : taxe foncière"},
+  ];
+  function startAnalyse(){
+    setStep("analyse"); setProgress(0);
+    let p=0;
+    timerRef.current=setInterval(()=>{
+      p+
