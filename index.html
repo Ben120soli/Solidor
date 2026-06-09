@@ -250,4 +250,489 @@ function render(){
     html+=`<div style="display:flex;align-items:center;gap:.85rem;margin-bottom:1rem">
       <span style="font-size:2.5rem">${prop.image}</span>
       <div><h1 style="font-size:1.15rem;font-weight:700;color:#1a3a2a">${esc(prop.nom)}</h1><p style="color:#8a7968;font-size:.75rem">📍 ${esc(prop.adresse)}</p>${bdg(sc,sc.label)}</div>
-      <button onclick="openEditProp(${prop.id})" style="margin-left:auto;background:#1a3a2a;color:#fff
+      <button onclick="openEditProp(${prop.id})" style="margin-left:auto;background:#1a3a2a;color:#fff;padding:.4rem .9rem;border-radius:.65rem;font-size:.78rem;cursor:pointer">✏️ Modifier</button>
+    </div>`;
+
+    html+=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin-bottom:1rem">`;
+    [["Loyer HC",fmt(prop.loyer),false,false],["Charges",fmt(prop.charges),false,false],["Net/mois",fmt(prop.loyer-prop.charges-(prop.syndic?.cotisation||0)),false,true],["Caution",fmt(prop.caution),false,false],["Surface",prop.surface+"m²",false,false],["Impayés",fmt(impT),impT>0,false]].forEach(([l,v,danger,accent])=>{
+      html+=`<div style="background:${danger?"#fdf2f2":accent?"#e8f4ed":"#f5f2ed"};border-radius:.65rem;padding:.6rem .7rem"><div style="font-size:.58rem;color:#a89a88;text-transform:uppercase;letter-spacing:.04em">${l}</div><div style="font-weight:700;color:${danger?"#c0392b":accent?"#1a3a2a":"#2d2820"};font-size:.88rem;margin-top:.15rem">${v}</div></div>`;
+    });
+    html+=`</div>`;
+
+    html+=`<div class="card" style="margin-bottom:1rem;padding:.85rem"><div style="font-size:.7rem;color:#8a7968;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.6rem">Statut du bien</div><div style="display:flex;gap:.5rem">`;
+    ["loué","vacant","travaux"].forEach(s=>{
+      const sc2=SP[s];
+      html+=`<button onclick="changeStatut('${s}')" style="flex:1;padding:.5rem .4rem;border-radius:.6rem;border:1.5px solid ${prop.statut===s?sc2.dot:"#ddd8cf"};background:${prop.statut===s?sc2.bg:"#faf9f7"};color:${prop.statut===s?sc2.text:"#5a4e42"};font-size:.78rem;font-weight:${prop.statut===s?700:400};cursor:pointer">${cap(s)}</button>`;
+    });
+    html+=`</div></div>`;
+
+    html+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1rem">`;
+    html+=`<div class="card" style="padding:.85rem"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem"><div style="font-size:.7rem;font-weight:700;color:#1a3a2a;text-transform:uppercase;letter-spacing:.05em">👤 Locataire</div><button onclick="openEditProp(${prop.id},'loc')" style="background:#f5f2ed;color:#5a4e42;font-size:.65rem;padding:.2rem .5rem;border-radius:.4rem;cursor:pointer">✏️</button></div>`;
+    if(prop.locataire){[["Nom",prop.locataire.nom],["Tél",prop.locataire.tel],["Entrée",fmtDate(prop.locataire.dateEntree)]].forEach(([l,v])=>{html+=`<div style="margin-bottom:.35rem"><div style="font-size:.62rem;color:#a89a88">${l}</div><div style="font-size:.78rem;font-weight:600;color:#2d2820;word-break:break-all">${esc(v)}</div></div>`;});}
+    else html+=`<div class="empty" style="padding:.75rem">👤<br>Aucun</div>`;
+    html+=`</div>`;
+
+    html+=`<div class="card" style="padding:.85rem"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem"><div style="font-size:.7rem;font-weight:700;color:#1a3a2a;text-transform:uppercase;letter-spacing:.05em">🏢 Syndic</div><button onclick="openEditProp(${prop.id},'syn')" style="background:#f5f2ed;color:#5a4e42;font-size:.65rem;padding:.2rem .5rem;border-radius:.4rem;cursor:pointer">✏️</button></div>`;
+    if(prop.syndic){[["Nom",prop.syndic.nom],["Tél",prop.syndic.tel],["Cotis.",fmt(prop.syndic.cotisation)+"/mois"]].forEach(([l,v])=>{html+=`<div style="margin-bottom:.35rem"><div style="font-size:.62rem;color:#a89a88">${l}</div><div style="font-size:.78rem;font-weight:600;color:#2d2820;word-break:break-all">${esc(v)}</div></div>`;});}
+    else html+=`<div class="empty" style="padding:.75rem">🏢<br>Aucun</div>`;
+    html+=`</div></div>`;
+
+    if(prop.notes)html+=`<div class="card" style="margin-bottom:1rem;padding:.85rem;background:#fffdf0;border:1px solid rgba(184,147,10,.2)"><div style="font-size:.72rem;color:#b8930a;font-weight:700;margin-bottom:.3rem">📝 Notes</div><div style="font-size:.82rem;color:#5a4e42">${esc(prop.notes)}</div></div>`;
+
+    // TABS
+    html+=`<div class="card">`;
+    html+=`<div style="display:flex;gap:.3rem;margin-bottom:1rem;overflow-x:auto;padding-bottom:.25rem">`;
+    [["loyers","💶 Loyers"],["travaux","🔧 Travaux"],["courriers","📬 Courriers"],["mails","✉️ Mails"]].forEach(([t,l])=>{
+      const impL=t==="loyers"?pL.filter(x=>x.statut==="impayé").length:0;
+      const unrM=t==="mails"?pM.filter(m=>!m.lu).length:0;
+      html+=`<button class="tab ${state.tab===t?"on":""}" onclick="setTab('${t}')">${l}${impL>0?`<span style="margin-left:3px;background:#e53935;color:#fff;font-size:.58rem;padding:0 4px;border-radius:6px">${impL}</span>`:""}${unrM>0?`<span style="margin-left:3px;background:#1e88e5;color:#fff;font-size:.58rem;padding:0 4px;border-radius:6px">${unrM}</span>`:""}</button>`;
+    });
+    html+=`</div>`;
+
+    // Tab loyers
+    if(state.tab==="loyers"){
+      html+=`<div class="sec-head"><h3 class="sec-title">Suivi des loyers</h3><button class="add-btn" onclick="openModal('addLoyer')">+ Ajouter</button></div>`;
+      if(pL.length===0)html+=`<div class="empty">💶<br>Aucun loyer enregistré</div>`;
+      pL.forEach(l=>{
+        const sl=SL[l.statut]||SL.attendu;
+        html+=`<div class="row">
+          <div style="flex:1"><div style="font-weight:600;font-size:.85rem;color:#2d2820">${moisLabel(l.mois)}</div>${l.notes?`<div style="font-size:.7rem;color:#a89a88">${esc(l.notes)}</div>`:""}</div>
+          <span style="font-weight:700;color:#2d2820;font-size:.85rem">${fmt(l.montant)}</span>
+          ${bdg(sl,sl.label)}
+          ${l.statut!=="payé"?`<select onchange="updateLoyerStatut(${l.id},this.value)" style="font-size:.72rem;padding:.25rem .4rem;border-radius:.45rem;border:1px solid #ddd8cf;background:#faf9f7;color:#2d2820;cursor:pointer;max-width:90px">
+            <option value="attendu"${l.statut==="attendu"?" selected":""}>Attendu</option>
+            <option value="retard"${l.statut==="retard"?" selected":""}>Retard</option>
+            <option value="impayé"${l.statut==="impayé"?" selected":""}>Impayé</option>
+            <option value="payé">✓ Payé</option>
+          </select>`:""}
+        </div>`;
+      });
+      if(impT>0)html+=`<div style="margin-top:.75rem;background:#fdf2f2;border-radius:.65rem;padding:.75rem;display:flex;justify-content:space-between;align-items:center"><span style="color:#c0392b;font-weight:600;font-size:.85rem">⚠️ Total impayés</span><span style="color:#c0392b;font-weight:700">${fmt(impT)}</span></div>`;
+    }
+
+    // Tab travaux
+    if(state.tab==="travaux"){
+      html+=`<div class="sec-head"><h3 class="sec-title">Entretien & Travaux</h3><button class="add-btn" onclick="openModal('addTravaux')">+ Ajouter</button></div>`;
+      if(pT.length===0)html+=`<div class="empty">🔧<br>Aucune intervention</div>`;
+      pT.forEach(t=>{
+        const tc=TT[t.type]||TT.entretien;
+        const st=SC[t.statut]||SC.envoyé;
+        html+=`<div class="row">${chp(tc.color,tc.bg,tc.label)}<div style="flex:1"><div style="font-weight:600;font-size:.85rem;color:#2d2820">${esc(t.desc)}</div><div style="font-size:.7rem;color:#8a7968">${esc(t.prestataire)} · ${fmtDate(t.date)}</div></div><span style="font-weight:700;color:#2d2820;font-size:.85rem">${fmt(t.montant)}</span>${bdg(st,t.statut)}</div>`;
+      });
+      html+=`<div style="margin-top:.75rem;background:#e8effa;border-radius:.65rem;padding:.75rem;display:flex;justify-content:space-between;align-items:center"><span style="color:#1a3a6a;font-weight:600;font-size:.85rem">Total dépenses</span><span style="color:#1a3a6a;font-weight:700">${fmt(trT)}</span></div>`;
+    }
+
+    // Tab courriers
+    if(state.tab==="courriers"){
+      html+=`<div class="sec-head"><h3 class="sec-title">Courriers & Procédures</h3><button class="add-btn" onclick="openModal('addCourrier')">+ Ajouter</button></div>`;
+      if(pC.length===0)html+=`<div class="empty">📬<br>Aucun courrier</div>`;
+      pC.forEach(c=>{
+        const sc2=SC[c.statut]||SC.envoyé;
+        html+=`<div class="row"><div style="flex:1"><div style="font-weight:600;font-size:.85rem;color:#2d2820">${esc(c.titre)}</div><div style="font-size:.7rem;color:#8a7968">${TC[c.type]||c.type} · ${fmtDate(c.date)}</div>${c.notes?`<div style="font-size:.68rem;color:#a89a88">📎 ${esc(c.notes)}</div>`:""}</div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">${bdg(sc2,c.statut)}<select onchange="updateCourrierStatut(${c.id},this.value)" style="font-size:.7rem;padding:.22rem .4rem;border-radius:.4rem;border:1px solid #ddd8cf;background:#faf9f7;color:#2d2820;cursor:pointer"><option value="planifié"${c.statut==="planifié"?" selected":""}>Planifié</option><option value="envoyé"${c.statut==="envoyé"?" selected":""}>Envoyé</option><option value="en_cours"${c.statut==="en_cours"?" selected":""}>En cours</option><option value="classé"${c.statut==="classé"?" selected":""}>Classé</option></select></div></div>`;
+      });
+    }
+
+    // Tab mails
+    if(state.tab==="mails"){
+      html+=`<div class="sec-head"><h3 class="sec-title">Messagerie</h3><button class="add-btn" onclick="openModal('addMail')">✉️ Nouveau</button></div>`;
+      if(pM.length===0)html+=`<div class="empty">✉️<br>Aucun mail</div>`;
+      pM.forEach(m=>{
+        html+=`<div class="row" onclick="viewMail(${m.id})" style="cursor:pointer;background:${m.lu?"":"#f0f6ff"}">
+          <span style="width:7px;height:7px;border-radius:50%;background:${m.lu?"transparent":"#1e88e5"};flex-shrink:0"></span>
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:.4rem;flex-wrap:wrap">
+              <span style="font-weight:${m.lu?400:700};font-size:.85rem;color:#2d2820;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px">${esc(m.objet)}</span>
+              ${m.aiTriage?chp("#1a3a2a","#e8f4ed","🤖"):""}
+              ${m.tag?chp("#1a3a6a","#e8effa",m.tag):""}
+            </div>
+            <div style="font-size:.7rem;color:#8a7968">${m.de==="moi"?"→ "+esc(m.a):"← "+esc(m.de)} · ${fmtDate(m.date)}</div>
+          </div>
+          <span style="color:#a89a88;font-size:.85rem">›</span>
+        </div>`;
+      });
+    }
+    html+=`</div>`;
+    html+=`<button onclick="confirmDelete(${prop.id})" style="width:100%;margin-top:1rem;background:#fdf2f2;color:#c0392b;padding:.7rem;border-radius:.75rem;font-size:.85rem;border:1px solid #f8c6c6;cursor:pointer">🗑️ Supprimer ce bien</button>`;
+  }
+
+  // ══ LOYERS GLOBAL ══
+  else if(state.nav==="loyers_g"){
+    html+=`<h1 style="font-size:1.2rem;font-weight:700;color:#1a3a2a;margin-bottom:1rem">💶 Loyers & Impayés</h1>`;
+    d.properties.forEach(p=>{
+      const pl=d.loyers.filter(l=>l.propId===p.id).sort((a,b)=>b.mois.localeCompare(a.mois));
+      if(pl.length===0)return;
+      html+=`<div class="card" style="margin-bottom:1rem"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem;cursor:pointer" onclick="goDetail(${p.id},'loyers')"><div style="display:flex;align-items:center;gap:.6rem"><span style="font-size:1.4rem">${p.image}</span><div><div style="font-weight:700;font-size:.9rem;color:#2d2820">${esc(p.nom)}</div><div style="font-size:.72rem;color:#8a7968">${p.locataire?.nom||"Vacant"}</div></div></div><span style="font-size:.78rem;color:#1a3a2a">Détail ›</span></div>`;
+      pl.slice(0,5).forEach(l=>{
+        const sl=SL[l.statut]||SL.attendu;
+        html+=`<div class="row"><span style="flex:1;font-size:.85rem;color:#2d2820">${moisLabel(l.mois)}</span><span style="font-weight:600;font-size:.85rem">${fmt(l.montant)}</span>${bdg(sl,sl.label)}${l.statut!=="payé"?`<select onchange="updateLoyerStatut(${l.id},this.value)" style="font-size:.72rem;padding:.22rem .4rem;border-radius:.4rem;border:1px solid #ddd8cf;background:#faf9f7;color:#2d2820;cursor:pointer;max-width:90px"><option value="attendu"${l.statut==="attendu"?" selected":""}>Attendu</option><option value="retard"${l.statut==="retard"?" selected":""}>Retard</option><option value="impayé"${l.statut==="impayé"?" selected":""}>Impayé</option><option value="payé">✓ Payé</option></select>`:""}
+        </div>`;
+      });
+      html+=`</div>`;
+    });
+  }
+
+  // ══ TRAVAUX GLOBAL ══
+  else if(state.nav==="travaux_g"){
+    html+=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem"><h1 style="font-size:1.2rem;font-weight:700;color:#1a3a2a">🔧 Travaux</h1><span style="font-weight:700;color:#2d2820;font-size:.9rem">${fmt(trCost)}</span></div>`;
+    d.properties.forEach(p=>{
+      const pt=d.travaux.filter(t=>t.propId===p.id).sort((a,b)=>b.date.localeCompare(a.date));
+      html+=`<div class="card" style="margin-bottom:1rem"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem"><div style="display:flex;align-items:center;gap:.6rem"><span style="font-size:1.4rem">${p.image}</span><div style="font-weight:700;font-size:.9rem;color:#2d2820">${esc(p.nom)}</div></div><button onclick="openAddTravaux(${p.id})" style="background:#1a3a2a;color:#fff;padding:.35rem .75rem;border-radius:.55rem;font-size:.75rem;cursor:pointer">+ Ajouter</button></div>`;
+      if(pt.length===0)html+=`<div class="empty">🔧<br>Aucune intervention</div>`;
+      pt.forEach(t=>{
+        const tc=TT[t.type]||TT.entretien;
+        const st=SC[t.statut]||SC.envoyé;
+        html+=`<div class="row">${chp(tc.color,tc.bg,tc.label)}<div style="flex:1"><div style="font-weight:600;font-size:.85rem;color:#2d2820">${esc(t.desc)}</div><div style="font-size:.7rem;color:#8a7968">${esc(t.prestataire)} · ${fmtDate(t.date)}</div></div><span style="font-weight:700;font-size:.85rem;color:#2d2820">${fmt(t.montant)}</span>${bdg(st,t.statut)}</div>`;
+      });
+      html+=`</div>`;
+    });
+  }
+
+  // ══ MORE ══
+  else if(state.nav==="more"){
+    html+=`<h1 style="font-size:1.2rem;font-weight:700;color:#1a3a2a;margin-bottom:1rem">Plus</h1>`;
+    html+=`<div class="card" style="margin-bottom:1rem"><div class="sec-head"><h3 class="sec-title">📬 Courriers & Procédures</h3></div>`;
+    d.properties.forEach(p=>{
+      const pc=d.courriers.filter(c=>c.propId===p.id).sort((a,b)=>b.date.localeCompare(a.date));
+      html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid #f5f2ed"><div style="display:flex;align-items:center;gap:.5rem"><span>${p.image}</span><span style="font-weight:600;font-size:.85rem;color:#2d2820">${esc(p.nom)}</span></div><button onclick="openAddCourrier(${p.id})" style="background:#1a3a2a;color:#fff;padding:.3rem .65rem;border-radius:.5rem;font-size:.72rem;cursor:pointer">+ Courrier</button></div>`;
+      if(pc.length===0)html+=`<div style="font-size:.78rem;color:#a89a88;padding:.5rem 0">Aucun courrier</div>`;
+      pc.slice(0,3).forEach(c=>{const sc2=SC[c.statut]||SC.envoyé;html+=`<div class="row"><div style="flex:1"><div style="font-weight:600;font-size:.82rem;color:#2d2820">${esc(c.titre)}</div><div style="font-size:.68rem;color:#8a7968">${TC[c.type]||c.type} · ${fmtDate(c.date)}</div></div>${bdg(sc2,c.statut)}</div>`;});
+    });
+    html+=`</div>`;
+
+    html+=`<div class="card" style="margin-bottom:1rem">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+        <h3 class="sec-title">✉️ Messagerie ${unread>0?`<span style="background:#1e88e5;color:#fff;font-size:.62rem;padding:1px 6px;border-radius:10px;margin-left:4px">${unread}</span>`:""}</h3>
+        <button onclick="openModal('aiTriage')" style="background:linear-gradient(135deg,#1a5c30,#0d3a1e);color:#a8e6b8;padding:.35rem .75rem;border-radius:.55rem;font-size:.72rem;border:1px solid #2d5c42;cursor:pointer">🤖 Triage IA</button>
+      </div>`;
+    d.properties.forEach(p=>{
+      const pm=d.mails.filter(m=>m.propId===p.id).sort((a,b)=>b.date.localeCompare(a.date));
+      const unr=pm.filter(m=>!m.lu).length;
+      html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid #f5f2ed"><div style="display:flex;align-items:center;gap:.5rem"><span>${p.image}</span><span style="font-weight:600;font-size:.85rem;color:#2d2820">${esc(p.nom)}</span>${unr>0?`<span style="background:#1e88e5;color:#fff;font-size:.62rem;padding:1px 6px;border-radius:10px">${unr}</span>`:""}</div><button onclick="openAddMail(${p.id})" style="background:#1a3a2a;color:#fff;padding:.3rem .65rem;border-radius:.5rem;font-size:.72rem;cursor:pointer">✉️ Nouveau</button></div>`;
+      pm.slice(0,4).forEach(m=>{
+        html+=`<div class="row" onclick="viewMail(${m.id})" style="cursor:pointer;background:${m.lu?"":"#f0f6ff"}">
+          <span style="width:6px;height:6px;border-radius:50%;background:${m.lu?"transparent":"#1e88e5"};flex-shrink:0"></span>
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:.4rem">
+              <span style="font-weight:${m.lu?400:700};font-size:.82rem;color:#2d2820;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px">${esc(m.objet)}</span>
+              ${m.aiTriage?chp("#1a3a2a","#e8f4ed","🤖"):""}
+              ${m.tag?chp("#1a3a6a","#e8effa",m.tag):""}
+            </div>
+            <div style="font-size:.68rem;color:#8a7968">${m.de==="moi"?"→ "+esc(m.a):"← "+esc(m.de)}</div>
+          </div>
+          <span style="color:#a89a88">›</span>
+        </div>`;
+      });
+    });
+    html+=`</div>`;
+    html+=`<div class="card" style="padding:.85rem;text-align:center"><div style="font-size:1.5rem;margin-bottom:.35rem">🗝️</div><div style="font-weight:700;color:#1a3a2a;font-size:.9rem">Solidor Immo</div><div style="font-size:.72rem;color:#8a7968;margin-top:.2rem">Version 2.0 — Données sauvegardées localement</div><button onclick="resetData()" style="margin-top:.75rem;background:#fdf2f2;color:#c0392b;padding:.4rem .85rem;border-radius:.6rem;font-size:.72rem;border:1px solid #f8c6c6;cursor:pointer">🔄 Réinitialiser les données</button></div>`;
+  }
+
+  main.innerHTML=html;
+  renderModal();
+}
+
+// ── MODAL ──
+function renderModal(){
+  const ex=document.getElementById("modalOverlay");
+  if(ex)ex.remove();
+  if(!state.modal)return;
+  const m=state.modal;
+  let html="";
+
+  if(m.type==="viewMail"){
+    const mail=m.payload;
+    html=`<div class="drag"></div><h2 style="font-size:1rem;font-weight:700;color:#1a3a2a;margin-bottom:1.1rem">${esc(mail.objet)}</h2>
+    <div style="background:#faf9f7;border-radius:.65rem;padding:1rem;margin-bottom:.85rem;font-size:.82rem;color:#8a7968">
+      <div style="margin-bottom:.3rem"><b style="color:#5a4e42">De :</b> ${mail.de==="moi"?"Moi":esc(mail.de)}</div>
+      <div style="margin-bottom:.3rem"><b style="color:#5a4e42">À :</b> ${esc(mail.a)}</div>
+      <div style="margin-bottom:.3rem"><b style="color:#5a4e42">Date :</b> ${fmtDate(mail.date)}</div>
+      <div style="display:flex;gap:.4rem;margin-top:.4rem;flex-wrap:wrap">${mail.tag?chp("#1a3a6a","#e8effa",mail.tag):""}${mail.aiTriage?chp("#1a3a2a","#e8f4ed","🤖 Importé par IA"):""}</div>
+    </div>
+    <div style="font-size:.85rem;color:#2d2820;line-height:1.75;white-space:pre-wrap;background:#fff;border-radius:.65rem;padding:.85rem;border:1px solid #ddd8cf">${esc(mail.corps)}</div>
+    <div style="margin-top:1rem"><button class="btn-secondary" onclick="closeModal()">Fermer</button></div>`;
+  }
+
+  else if(m.type==="confirmDelete"){
+    html=`<div class="drag"></div><h2 style="font-size:1rem;font-weight:700;color:#1a3a2a;margin-bottom:1rem">Supprimer ce bien ?</h2>
+    <p style="color:#5a4e42;font-size:.88rem;margin-bottom:1.25rem;line-height:1.6">Cette action est irréversible. <strong>${esc(m.payload.nom)}</strong> sera supprimé définitivement.</p>
+    <div style="display:flex;gap:.65rem"><button class="btn-secondary" onclick="closeModal()">Annuler</button><button style="flex:1;background:#c0392b;color:#fff;padding:.7rem;border-radius:.75rem;font-size:.88rem;cursor:pointer;border:none" onclick="deleteProp(${m.payload.id})">Supprimer</button></div>`;
+  }
+
+  else if(m.type==="addLoyer"){
+    html=`<div class="drag"></div><h2 style="font-size:1rem;font-weight:700;color:#1a3a2a;margin-bottom:1rem">Enregistrer un loyer</h2>
+    <div style="display:flex;flex-direction:column;gap:.75rem">
+      <div>${lbl("Mois *")}<input class="input" type="month" id="f_mois"></div>
+      <div>${lbl("Montant (€) *")}<input class="input" type="number" id="f_montant" placeholder="0"></div>
+      <div>${lbl("Statut")}<select class="input" id="f_statut"><option value="payé">Payé</option><option value="attendu">Attendu</option><option value="retard">En retard</option><option value="impayé">Impayé</option></select></div>
+      <div>${lbl("Date de paiement")}<input class="input" type="date" id="f_date"></div>
+      <div>${lbl("Notes")}<textarea class="input" id="f_notes" rows="2"></textarea></div>
+    </div>
+    <div style="display:flex;gap:.65rem;margin-top:1.25rem"><button class="btn-secondary" onclick="closeModal()">Annuler</button><button class="btn-primary" onclick="saveLoyer()" style="flex:2">Enregistrer</button></div>`;
+  }
+
+  else if(m.type==="addTravaux"){
+    html=`<div class="drag"></div><h2 style="font-size:1rem;font-weight:700;color:#1a3a2a;margin-bottom:1rem">Ajouter une intervention</h2>
+    <div style="display:flex;flex-direction:column;gap:.75rem">
+      <div>${lbl("Description *")}<input class="input" id="f_desc" placeholder="Ex: Révision chaudière"></div>
+      <div>${lbl("Catégorie")}<select class="input" id="f_type"><option value="entretien">Entretien</option><option value="travaux">Travaux</option><option value="urgence">Urgence</option><option value="syndic">Syndic</option></select></div>
+      <div>${lbl("Coût (€) *")}<input class="input" type="number" id="f_montant" placeholder="0"></div>
+      <div>${lbl("Prestataire")}<input class="input" id="f_presta" placeholder="Nom du prestataire"></div>
+      <div>${lbl("Date")}<input class="input" type="date" id="f_date" value="${new Date().toISOString().slice(0,10)}"></div>
+      <div>${lbl("Statut")}<select class="input" id="f_statut"><option value="planifié">Planifié</option><option value="en_cours">En cours</option><option value="terminé">Terminé</option></select></div>
+    </div>
+    <div style="display:flex;gap:.65rem;margin-top:1.25rem"><button class="btn-secondary" onclick="closeModal()">Annuler</button><button class="btn-primary" onclick="saveTravaux()" style="flex:2">Enregistrer</button></div>`;
+  }
+
+  else if(m.type==="addCourrier"){
+    html=`<div class="drag"></div><h2 style="font-size:1rem;font-weight:700;color:#1a3a2a;margin-bottom:1rem">Nouveau courrier / procédure</h2>
+    <div style="display:flex;flex-direction:column;gap:.75rem">
+      <div>${lbl("Titre *")}<input class="input" id="f_titre" placeholder="Ex: Relance loyer juillet"></div>
+      <div>${lbl("Type")}<select class="input" id="f_type"><option value="relance">Relance</option><option value="mise_en_demeure">Mise en demeure</option><option value="commandement">Commandement de payer</option><option value="congé">Congé donné</option><option value="autre">Autre</option></select></div>
+      <div>${lbl("Destinataire *")}<input class="input" id="f_dest" placeholder="Nom du destinataire"></div>
+      <div>${lbl("Statut")}<select class="input" id="f_statut"><option value="planifié">Planifié</option><option value="envoyé">Envoyé</option><option value="en_cours">En cours</option><option value="classé">Classé</option></select></div>
+      <div>${lbl("Notes / Suivi")}<textarea class="input" id="f_notes" rows="2"></textarea></div>
+    </div>
+    <div style="display:flex;gap:.65rem;margin-top:1.25rem"><button class="btn-secondary" onclick="closeModal()">Annuler</button><button class="btn-primary" onclick="saveCourrier()" style="flex:2">Enregistrer</button></div>`;
+  }
+
+  else if(m.type==="addMail"){
+    html=`<div class="drag"></div><h2 style="font-size:1rem;font-weight:700;color:#1a3a2a;margin-bottom:1rem">Rédiger un mail</h2>
+    <div style="display:flex;flex-direction:column;gap:.75rem">
+      <div>${lbl("Objet *")}<input class="input" id="f_objet" placeholder="Objet du mail"></div>
+      <div>${lbl("Destinataire *")}<input class="input" id="f_a" placeholder="email@exemple.fr"></div>
+      <div>${lbl("Catégorie")}<select class="input" id="f_tag"><option value="loyer">Loyer</option><option value="travaux">Travaux</option><option value="syndic">Syndic</option><option value="procédure">Procédure</option><option value="autre">Autre</option></select></div>
+      <div>${lbl("Message *")}<textarea class="input" id="f_corps" rows="5" placeholder="Votre message..."></textarea></div>
+    </div>
+    <div style="display:flex;gap:.65rem;margin-top:1.25rem"><button class="btn-secondary" onclick="closeModal()">Annuler</button><button class="btn-primary" onclick="saveMail()" style="flex:2">Envoyer</button></div>`;
+  }
+
+  else if(m.type==="addProp"||m.type==="editProp"){
+    const p=m.payload||{};
+    const isEdit=!!p.id;
+    const loc=p.locataire||{};
+    const syn=p.syndic||{};
+    html=`<div class="drag"></div><h2 style="font-size:1rem;font-weight:700;color:#1a3a2a;margin-bottom:1rem">${isEdit?"Modifier le bien":"Nouveau bien"}</h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">
+      <div style="grid-column:span 2">${lbl("Nom *")}<input class="input" id="f_nom" value="${esc(p.nom||"")}" placeholder="Ex: Appt Centre-Ville"></div>
+      <div style="grid-column:span 2">${lbl("Adresse *")}<input class="input" id="f_adresse" value="${esc(p.adresse||"")}" placeholder="Rue, CP, Ville"></div>
+      <div>${lbl("Type")}<select class="input" id="f_type"><option${!p.type||p.type==="Appartement"?" selected":""}>Appartement</option><option${p.type==="Studio"?" selected":""}>Studio</option><option${p.type==="Maison"?" selected":""}>Maison</option><option${p.type==="Commerce"?" selected":""}>Commerce</option><option${p.type==="Parking"?" selected":""}>Parking</option></select></div>
+      <div>${lbl("Surface (m²)")}<input class="input" type="number" id="f_surface" value="${p.surface||""}"></div>
+      <div>${lbl("Loyer HC (€/mois)")}<input class="input" type="number" id="f_loyer" value="${p.loyer||""}"></div>
+      <div>${lbl("Charges (€/mois)")}<input class="input" type="number" id="f_charges" value="${p.charges||""}"></div>
+      <div>${lbl("Caution (€)")}<input class="input" type="number" id="f_caution" value="${p.caution||""}"></div>
+      <div>${lbl("Statut")}<select class="input" id="f_statut"><option value="loué"${p.statut==="loué"?" selected":""}>Loué</option><option value="vacant"${!p.statut||p.statut==="vacant"?" selected":""}>Vacant</option><option value="travaux"${p.statut==="travaux"?" selected":""}>Travaux</option></select></div>
+      <div style="grid-column:span 2">${lbl("Notes")}<textarea class="input" id="f_notes" rows="2">${esc(p.notes||"")}</textarea></div>
+    </div>
+
+    <button class="sec-toggle" onclick="toggleSection('sec_loc')">
+      <span id="sec_loc_arrow">${p.locataire?"▼":"►"}</span> 👤 Locataire
+    </button>
+    <div id="sec_loc" style="display:${p.locataire?"block":"none"}">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.5rem">
+        <div style="grid-column:span 2">${lbl("Nom complet")}<input class="input" id="f_loc_nom" value="${esc(loc.nom||"")}" placeholder="Prénom Nom"></div>
+        <div>${lbl("Email")}<input class="input" type="email" id="f_loc_email" value="${esc(loc.email||"")}" placeholder="email@..."></div>
+        <div>${lbl("Téléphone")}<input class="input" id="f_loc_tel" value="${esc(loc.tel||"")}" placeholder="06..."></div>
+        <div style="grid-column:span 2">${lbl("Date d'entrée")}<input class="input" type="date" id="f_loc_date" value="${loc.dateEntree||""}"></div>
+      </div>
+    </div>
+
+    <button class="sec-toggle" onclick="toggleSection('sec_syn')">
+      <span id="sec_syn_arrow">${p.syndic?"▼":"►"}</span> 🏢 Syndic / Gestionnaire
+    </button>
+    <div id="sec_syn" style="display:${p.syndic?"block":"none"}">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.5rem">
+        <div style="grid-column:span 2">${lbl("Nom du syndic")}<input class="input" id="f_syn_nom" value="${esc(syn.nom||"")}" placeholder="Nom du syndic"></div>
+        <div>${lbl("Email contact")}<input class="input" id="f_syn_contact" value="${esc(syn.contact||"")}" placeholder="email@..."></div>
+        <div>${lbl("Téléphone")}<input class="input" id="f_syn_tel" value="${esc(syn.tel||"")}" placeholder="01..."></div>
+        <div style="grid-column:span 2">${lbl("Cotisation (€/mois)")}<input class="input" type="number" id="f_syn_cotisation" value="${syn.cotisation||""}"></div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:.65rem;margin-top:1.25rem">
+      <button class="btn-secondary" onclick="closeModal()">Annuler</button>
+      <button class="btn-primary" onclick="saveProp(${isEdit?p.id:0})" style="flex:2">${isEdit?"Enregistrer":"Créer le bien"}</button>
+    </div>`;
+  }
+
+  else if(m.type==="aiTriage"){
+    html=`<div class="drag"></div><h2 style="font-size:1rem;font-weight:700;color:#1a3a2a;margin-bottom:1rem">🤖 Triage IA — Boîte mail</h2>
+    <p style="font-size:.85rem;color:#5a4e42;line-height:1.6;margin-bottom:1rem">L'IA analyse votre boîte mail et importe automatiquement les emails immobiliers classés par bien.</p>
+    <div style="background:#fffdf0;border:1px solid rgba(184,147,10,.3);border-radius:.65rem;padding:.85rem;margin-bottom:1rem;font-size:.78rem;color:#b8930a">⚠️ Mode démo — voir la documentation technique pour la connexion réelle à Gmail/Outlook.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:1rem">
+      ${[["gmail","📧 Gmail"],["outlook","📬 Outlook"],["imap","🖥️ IMAP"],["yahoo","📮 Yahoo"]].map(([v,l])=>`<button onclick="startAITriage('${v}')" style="padding:.75rem;border-radius:.7rem;border:2px solid #ddd8cf;background:#faf9f7;font-size:.85rem;color:#5a4e42;cursor:pointer;font-family:Georgia,serif">${l}</button>`).join("")}
+    </div>
+    <div style="display:flex;gap:.65rem"><button class="btn-secondary" onclick="closeModal()">Annuler</button></div>`;
+  }
+
+  const overlay=document.createElement("div");
+  overlay.className="overlay";
+  overlay.id="modalOverlay";
+  overlay.onclick=function(e){if(e.target===this)closeModal();};
+  const sheet=document.createElement("div");
+  sheet.className="sheet";
+  sheet.innerHTML=html;
+  overlay.appendChild(sheet);
+  document.body.appendChild(overlay);
+}
+
+// ── ACTIONS ──
+function goNav(v){state.nav=v;if(v!=="detail"&&v!=="more")state.propId=null;render();}
+function goDetail(id,t){state.propId=id;state.tab=t||"loyers";state.nav="detail";render();}
+function setTab(t){state.tab=t;render();}
+function openModal(t){state.modal={type:t};renderModal();}
+function closeModal(){state.modal=null;renderModal();}
+function openAddProp(){state.modal={type:"addProp",payload:{}};renderModal();}
+function openEditProp(id,section){
+  const p=state.data.properties.find(x=>x.id===id);
+  state.modal={type:"editProp",payload:p};
+  renderModal();
+  if(section==="loc"){setTimeout(()=>toggleSection("sec_loc"),100);}
+  if(section==="syn"){setTimeout(()=>toggleSection("sec_syn"),100);}
+}
+function openAddTravaux(pid){state.propId=pid;state.modal={type:"addTravaux"};renderModal();}
+function openAddCourrier(pid){state.propId=pid;state.modal={type:"addCourrier"};renderModal();}
+function openAddMail(pid){state.propId=pid;state.modal={type:"addMail"};renderModal();}
+
+function toggleSection(id){
+  const el=document.getElementById(id);
+  const arrow=document.getElementById(id+"_arrow");
+  if(!el)return;
+  const open=el.style.display==="none";
+  el.style.display=open?"block":"none";
+  if(arrow)arrow.textContent=open?"▼":"►";
+}
+
+function viewMail(id){
+  const m=state.data.mails.find(x=>x.id===id);
+  if(!m)return;
+  state.data.mails=state.data.mails.map(x=>x.id===id?{...x,lu:true}:x);
+  saveData();
+  state.modal={type:"viewMail",payload:{...m,lu:true}};
+  renderModal();
+}
+
+function confirmDelete(id){
+  const p=state.data.properties.find(x=>x.id===id);
+  if(p){state.modal={type:"confirmDelete",payload:p};renderModal();}
+}
+
+function deleteProp(id){
+  state.data.properties=state.data.properties.filter(p=>p.id!==id);
+  state.data.loyers=state.data.loyers.filter(l=>l.propId!==id);
+  state.data.travaux=state.data.travaux.filter(t=>t.propId!==id);
+  state.data.courriers=state.data.courriers.filter(c=>c.propId!==id);
+  state.data.mails=state.data.mails.filter(m=>m.propId!==id);
+  saveData();closeModal();state.nav="biens";state.propId=null;render();
+}
+
+function changeStatut(s){
+  state.data.properties=state.data.properties.map(p=>p.id===state.propId?{...p,statut:s}:p);
+  saveData();render();
+}
+
+function updateLoyerStatut(id,statut){
+  state.data.loyers=state.data.loyers.map(l=>l.id===id?{...l,statut,datePaiement:statut==="payé"?new Date().toISOString().slice(0,10):l.datePaiement}:l);
+  saveData();render();
+}
+
+function updateCourrierStatut(id,statut){
+  state.data.courriers=state.data.courriers.map(c=>c.id===id?{...c,statut}:c);
+  saveData();render();
+}
+
+function saveLoyer(){
+  const mois=gv("f_mois");const montant=gv("f_montant");
+  if(!mois||!montant)return alert("Veuillez remplir les champs obligatoires.");
+  state.data.loyers.push({id:Date.now(),propId:state.propId,mois,montant:+montant,statut:gv("f_statut")||"payé",datePaiement:gv("f_date"),notes:gv("f_notes")});
+  saveData();closeModal();render();
+}
+
+function saveTravaux(){
+  const desc=gv("f_desc");const montant=gv("f_montant");
+  if(!desc||!montant)return alert("Veuillez remplir les champs obligatoires.");
+  state.data.travaux.push({id:Date.now(),propId:state.propId,desc,type:gv("f_type")||"entretien",montant:+montant,prestataire:gv("f_presta"),date:gv("f_date")||new Date().toISOString().slice(0,10),statut:gv("f_statut")||"terminé"});
+  saveData();closeModal();render();
+}
+
+function saveCourrier(){
+  const titre=gv("f_titre");const dest=gv("f_dest");
+  if(!titre||!dest)return alert("Veuillez remplir les champs obligatoires.");
+  state.data.courriers.push({id:Date.now(),propId:state.propId,titre,type:gv("f_type")||"relance",destinataire:dest,statut:gv("f_statut")||"envoyé",notes:gv("f_notes"),date:new Date().toISOString().slice(0,10)});
+  saveData();closeModal();render();
+}
+
+function saveMail(){
+  const objet=gv("f_objet");const a=gv("f_a");const corps=gv("f_corps");
+  if(!objet||!a||!corps)return alert("Veuillez remplir les champs obligatoires.");
+  state.data.mails.push({id:Date.now(),propId:state.propId,objet,a,corps,de:"moi",date:new Date().toISOString().slice(0,10),tag:gv("f_tag")||"autre",lu:true,aiTriage:false});
+  saveData();closeModal();render();
+}
+
+function saveProp(editId){
+  const nom=gv("f_nom");const adresse=gv("f_adresse");
+  if(!nom||!adresse)return alert("Veuillez remplir le nom et l'adresse.");
+
+  // Locataire
+  const locNom=gv("f_loc_nom");
+  const loc=locNom?{nom:locNom,email:gv("f_loc_email"),tel:gv("f_loc_tel"),dateEntree:gv("f_loc_date")}:null;
+
+  // Syndic
+  const synNom=gv("f_syn_nom");
+  const syn=synNom?{nom:synNom,contact:gv("f_syn_contact"),tel:gv("f_syn_tel"),cotisation:+gv("f_syn_cotisation")||0}:null;
+
+  const p={
+    id:editId||Date.now(),nom,adresse,
+    type:gv("f_type")||"Appartement",
+    surface:+gv("f_surface")||0,
+    loyer:+gv("f_loyer")||0,
+    charges:+gv("f_charges")||0,
+    caution:+gv("f_caution")||0,
+    statut:gv("f_statut")||"vacant",
+    notes:gv("f_notes"),
+    image:editId?state.data.properties.find(x=>x.id===editId)?.image||"🏠":"🏠",
+    locataire:loc,syndic:syn
+  };
+
+  if(editId){state.data.properties=state.data.properties.map(x=>x.id===editId?p:x);}
+  else{state.data.properties.push(p);}
+  saveData();closeModal();
+  if(editId&&state.nav==="detail"){state.propId=editId;}
+  render();
+}
+
+function startAITriage(src){
+  closeModal();
+  const propId=state.data.properties.length>0?state.data.properties[0].id:null;
+  const now=new Date().toISOString().slice(0,10);
+  const fakeEmails=[
+    {id:Date.now(),propId,date:now,objet:"Question sur les charges — "+src,de:"locataire@email.fr",a:"moi",corps:"Bonjour,\n\nJe souhaitais avoir des précisions sur le montant des charges ce mois-ci.\n\nCordialement",tag:"loyer",lu:false,aiTriage:true},
+    {id:Date.now()+1,propId,date:now,objet:"Convocation Assemblée Générale",de:"syndic@immobilier.fr",a:"moi",corps:"Madame, Monsieur,\n\nVous êtes convoqué à l'assemblée générale annuelle le 15 novembre.\n\nLe Syndic",tag:"syndic",lu:false,aiTriage:true},
+    {id:Date.now()+2,propId,date:now,objet:"Devis travaux plomberie",de:"plombier@gmail.com",a:"moi",corps:"Bonjour,\n\nSuite à votre demande, je vous adresse le devis pour la réparation.\n\nCordialement",tag:"travaux",lu:false,aiTriage:true},
+  ];
+  fakeEmails.forEach(m=>state.data.mails.push(m));
+  saveData();
+  alert(`✅ ${fakeEmails.length} emails importés par l'IA !`);
+  render();
+}
+
+function resetData(){
+  if(confirm("Réinitialiser toutes les données ? Cette action est irréversible.")){
+    localStorage.removeItem(STORAGE_KEY);
+    state.data=JSON.parse(JSON.stringify(DEFAULT_DATA));
+    saveData();render();
+  }
+}
+
+// ── EVENT LISTENERS ──
+document.getElementById("backBtn").addEventListener("click",()=>{
+  if(state.nav==="detail"){state.nav="biens";state.propId=null;}
+  else{state.nav="dashboard";}
+  render();
+});
+document.getElementById("aiBtn").addEventListener("click",()=>{state.modal={type:"aiTriage"};renderModal();});
+document.getElementById("addPropBtn").addEventListener("click",()=>openAddProp());
+
+render();
+</script>
+</body>
+</html>
