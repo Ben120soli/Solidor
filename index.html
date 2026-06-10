@@ -6,731 +6,843 @@
 <meta name="theme-color" content="#1a3a2a"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-title" content="Solidor Immo"/>
-<meta name="mobile-web-app-capable" content="yes"/>
 <title>Solidor Immo</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+*{box-sizing:border-box;margin:0;padding:0}
 body{font-family:Georgia,serif;background:#f5f2ed;min-height:100vh}
-button{cursor:pointer;border:none;font-family:inherit;outline:none}
+button{cursor:pointer;border:none;font-family:inherit}
 input,select,textarea{font-family:inherit;outline:none}
-::-webkit-scrollbar{display:none}
-#app{max-width:600px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
-.card{background:#fff;border-radius:1rem;box-shadow:0 2px 12px rgba(45,40,32,.08);padding:1rem}
-.row{display:flex;align-items:center;gap:.65rem;padding:.75rem .85rem;border-bottom:1px solid #f5f2ed}
+#app{max-width:600px;margin:0 auto;display:flex;flex-direction:column;min-height:100vh}
+.hdr{background:#1a3a2a;color:#fff;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 1rem;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.hbtn{background:rgba(255,255,255,.18);color:#fff;border-radius:.6rem;padding:.35rem .7rem;font-size:.75rem;cursor:pointer}
+.main{flex:1;padding:1rem;padding-bottom:5.5rem;overflow-y:auto}
+.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:600px;background:#fff;border-top:1px solid #ddd;display:flex;padding:.35rem .25rem .5rem;z-index:100;box-shadow:0 -2px 8px rgba(0,0,0,.08)}
+.nb{display:flex;flex-direction:column;align-items:center;gap:.15rem;padding:.4rem .15rem;background:none;color:#8a7968;font-size:.55rem;flex:1;min-width:0}
+.nb.on{color:#1a3a2a}
+.nb .ic{font-size:1.2rem;line-height:1}
+.card{background:#fff;border-radius:1rem;box-shadow:0 2px 12px rgba(0,0,0,.07);padding:1rem;margin-bottom:1rem}
+.row{display:flex;align-items:center;gap:.65rem;padding:.7rem .85rem;border-bottom:1px solid #f5f2ed}
 .row:last-child{border-bottom:none}
 .row:active{background:#faf9f7}
-.badge{display:inline-flex;align-items:center;gap:3px;font-size:.68rem;padding:.22rem .6rem;border-radius:2rem;font-weight:600;white-space:nowrap}
-.chip{display:inline-block;font-size:.68rem;padding:.18rem .55rem;border-radius:2rem;font-weight:600;white-space:nowrap}
-.tab{padding:.45rem .85rem;border-radius:.55rem;font-size:.78rem;background:none;color:#8a7968;white-space:nowrap}
+.tab{padding:.4rem .75rem;border-radius:.55rem;font-size:.75rem;background:none;color:#8a7968;white-space:nowrap;cursor:pointer}
 .tab.on{background:#1a3a2a;color:#fff;font-weight:600}
-.navbtn{display:flex;flex-direction:column;align-items:center;gap:.2rem;padding:.5rem .25rem;background:none;color:#8a7968;font-size:.6rem;flex:1}
-.navbtn.on{color:#1a3a2a}
-.navbtn .ni{font-size:1.3rem;line-height:1}
-.input{width:100%;padding:.6rem .85rem;border:1.5px solid #ddd8cf;border-radius:.6rem;background:#faf9f7;font-size:.85rem;color:#2d2820}
-.input:focus{border-color:#1a3a2a;background:#fff}
-.btn-primary{background:#1a3a2a;color:#fff;padding:.7rem 1.25rem;border-radius:.75rem;font-size:.88rem;font-weight:600;width:100%;cursor:pointer}
-.btn-secondary{background:#ede8e0;color:#5a4e42;padding:.7rem 1.25rem;border-radius:.75rem;font-size:.88rem;width:100%;cursor:pointer}
-.overlay{position:fixed;inset:0;background:rgba(10,18,35,.7);z-index:2000;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)}
-.sheet{background:#fff;border-radius:1.25rem 1.25rem 0 0;padding:1.25rem 1.25rem 2rem;width:100%;max-width:600px;max-height:92vh;overflow-y:auto}
-.drag{width:36px;height:4px;border-radius:2px;background:#ddd8cf;margin:0 auto .9rem}
-.header{background:#1a3a2a;color:#fff;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.15)}
-.header-inner{display:flex;align-items:center;justify-content:space-between;height:52px;padding:0 1rem}
-.hbtn{background:rgba(255,255,255,.15);color:#fff;border-radius:.6rem;padding:.35rem .7rem;font-size:.75rem;cursor:pointer}
-.main{flex:1;overflow-y:auto;padding:1rem;padding-bottom:5rem}
-.bottomnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:600px;background:#fff;border-top:1px solid #ddd8cf;display:flex;padding:.4rem .5rem .5rem;z-index:100;box-shadow:0 -2px 12px rgba(0,0,0,.08)}
-.kpi{border-radius:1rem;padding:.85rem;background:#fff;box-shadow:0 2px 12px rgba(45,40,32,.08)}
-.sec-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
-.sec-title{font-size:.9rem;font-weight:700;color:#1a3a2a;margin:0}
-.add-btn{background:#1a3a2a;color:#fff;border:none;border-radius:.55rem;padding:.38rem .8rem;font-size:.75rem;cursor:pointer}
+.inp{width:100%;padding:.6rem .85rem;border:1.5px solid #ddd;border-radius:.6rem;background:#faf9f7;font-size:.85rem;color:#2d2820}
+.inp:focus{border-color:#1a3a2a;background:#fff}
+.ovl{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:2000;display:flex;align-items:flex-end;justify-content:center}
+.sht{background:#fff;border-radius:1.25rem 1.25rem 0 0;padding:1.25rem 1.25rem 2.5rem;width:100%;max-width:600px;max-height:92vh;overflow-y:auto}
+.drag{width:36px;height:4px;border-radius:2px;background:#ddd;margin:0 auto .9rem}
+.lbl{display:block;font-size:.7rem;color:#8a7968;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.3rem}
+.bp{background:#1a3a2a;color:#fff;padding:.7rem;border-radius:.75rem;font-size:.88rem;font-weight:600;width:100%;cursor:pointer}
+.bs{background:#ede8e0;color:#5a4e42;padding:.7rem;border-radius:.75rem;font-size:.88rem;width:100%;cursor:pointer}
+.bdg{display:inline-flex;align-items:center;gap:3px;font-size:.68rem;padding:.22rem .6rem;border-radius:2rem;font-weight:600;white-space:nowrap}
+.chp{display:inline-block;font-size:.68rem;padding:.18rem .55rem;border-radius:2rem;font-weight:600}
+.kpi{background:#fff;border-radius:1rem;padding:.85rem;box-shadow:0 2px 12px rgba(0,0,0,.07)}
+.sh{display:flex;justify-content:space-between;align-items:center;margin-bottom:.85rem}
+.st{font-size:.9rem;font-weight:700;color:#1a3a2a;margin:0}
+.ab{background:#1a3a2a;color:#fff;border-radius:.55rem;padding:.35rem .75rem;font-size:.75rem;cursor:pointer}
+.mt{font-size:.78rem;font-weight:700;color:#1a3a2a;text-transform:uppercase;letter-spacing:.05em;padding-top:.85rem;margin:.75rem 0 .5rem;border-top:1px solid #ddd;width:100%;text-align:left;background:none;display:flex;gap:.5rem;align-items:center}
+.sv{position:fixed;top:60px;right:12px;background:#1a3a2a;color:#fff;font-size:.72rem;padding:.3rem .75rem;border-radius:2rem;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none}
+.sv.on{opacity:1}
 .empty{text-align:center;padding:1.5rem;color:#a89a88;font-size:.85rem}
-.prop-card{background:#fff;border-radius:1rem;box-shadow:0 2px 12px rgba(45,40,32,.08);overflow:hidden;cursor:pointer;margin-bottom:1rem}
-.prop-card:active{opacity:.9}
-.sec-toggle{font-size:.78rem;font-weight:700;color:#1a3a2a;text-transform:uppercase;letter-spacing:.05em;margin:1rem 0 .65rem;padding-top:.85rem;border-top:1px solid #ddd8cf;display:flex;align-items:center;gap:.5rem;cursor:pointer;background:none;width:100%;text-align:left}
-.save-indicator{position:fixed;top:60px;right:12px;background:#1a3a2a;color:#fff;font-size:.72rem;padding:.3rem .75rem;border-radius:2rem;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none}
-.save-indicator.show{opacity:1}
+.cal{width:100%;border-collapse:collapse;font-size:.78rem}
+.cal th{background:#1a3a2a;color:#fff;padding:.4rem .2rem;text-align:center;font-weight:600}
+.cal td{border:1px solid #e8e3da;padding:.3rem .2rem;text-align:center;min-height:32px;vertical-align:top;cursor:pointer;font-size:.7rem}
+.cal td:active{background:#f0f7f4}
+.res{border-radius:3px;padding:1px 3px;font-size:.62rem;font-weight:600;margin-top:1px;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.col-sel{background:#e8f4ed!important;border:2px solid #1a3a2a!important}
 </style>
 </head>
 <body>
 <div id="app">
-  <div class="header">
-    <div class="header-inner">
-      <div style="display:flex;align-items:center;gap:.55rem">
-        <button id="backBtn" class="hbtn" style="display:none;margin-right:.25rem">←</button>
-        <span style="font-size:1.1rem">🗝️</span>
-        <span style="font-weight:700;font-size:.95rem;letter-spacing:.02em">Solidor Immo</span>
-      </div>
-      <div style="display:flex;gap:.5rem">
-        <button class="hbtn" id="aiBtn">🤖 IA</button>
-        <button class="hbtn" id="addPropBtn">+ Bien</button>
-      </div>
+  <div class="hdr">
+    <div style="display:flex;align-items:center;gap:.55rem">
+      <button id="backBtn" class="hbtn" style="display:none">&#8592;</button>
+      <span style="font-size:1.1rem">&#128273;</span>
+      <span style="font-weight:700;font-size:.92rem">Solidor Immo</span>
+    </div>
+    <div style="display:flex;gap:.4rem">
+      <button class="hbtn" id="aiBtn" style="font-size:.72rem">&#129302; IA</button>
+      <button class="hbtn" id="addBtn" style="font-size:.72rem">+ Bien</button>
     </div>
   </div>
-  <div class="save-indicator" id="saveIndicator">✓ Sauvegardé</div>
+  <div class="sv" id="sv">&#10003; Sauvegarde</div>
   <div class="main" id="main"></div>
-  <nav class="bottomnav" id="bottomnav"></nav>
+  <nav class="bnav" id="bnav"></nav>
 </div>
-
 <script>
-// ── HELPERS ──
-const fmt=n=>new Intl.NumberFormat("fr-FR",{style:"currency",currency:"EUR",maximumFractionDigits:0}).format(n||0);
-const fmtDate=d=>d?new Date(d).toLocaleDateString("fr-FR"):"—";
-const moisLabel=m=>{if(!m)return"—";const[y,mo]=m.split("-");return new Date(y,mo-1).toLocaleDateString("fr-FR",{month:"long",year:"numeric"})};
-const cap=s=>s?s.charAt(0).toUpperCase()+s.slice(1):"";
-const esc=s=>String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-const gv=id=>document.getElementById(id)?.value||"";
+var SK="solidor_v4";
+var fmt=function(n){return new Intl.NumberFormat("fr-FR",{style:"currency",currency:"EUR",maximumFractionDigits:0}).format(n||0);};
+var fd=function(d){return d?new Date(d).toLocaleDateString("fr-FR"):"--";};
+var ml=function(m){if(!m)return"--";var p=m.split("-");return new Date(p[0],p[1]-1).toLocaleDateString("fr-FR",{month:"long",year:"numeric"});};
+var esc=function(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");};
+var gv=function(id){var el=document.getElementById(id);return el?el.value:"";};
 
-// ── SAUVEGARDE LOCALE ──
-const STORAGE_KEY="solidor_immo_v2";
-function saveData(){
+function saveD(){
   try{
-    localStorage.setItem(STORAGE_KEY,JSON.stringify(state.data));
-    const ind=document.getElementById("saveIndicator");
-    if(ind){ind.classList.add("show");setTimeout(()=>ind.classList.remove("show"),1500);}
+    localStorage.setItem(SK,JSON.stringify(S.data));
+    var el=document.getElementById("sv");
+    if(el){el.classList.add("on");setTimeout(function(){el.classList.remove("on");},1500);}
   }catch(e){}
 }
-function loadData(){
-  try{
-    const saved=localStorage.getItem(STORAGE_KEY);
-    if(saved)return JSON.parse(saved);
-  }catch(e){}
+function loadD(){
+  try{var s=localStorage.getItem(SK);if(s)return JSON.parse(s);}catch(e){}
   return null;
 }
 
-// ── DONNÉES INITIALES ──
-const DEFAULT_DATA={
-  properties:[
-    {id:1,nom:"Appt Haussmannien",adresse:"12 Rue de Rivoli, 75001 Paris",type:"Appartement",surface:78,image:"🏛️",statut:"loué",loyer:1850,charges:220,caution:3700,notes:"Parquet ancien, double vitrage refait 2022.",
-     locataire:{nom:"Marie Dupont",email:"marie.dupont@email.fr",tel:"06 12 34 56 78",dateEntree:"2023-03-01"},
-     syndic:{nom:"Syndic Rivoli",contact:"contact@syndic-rivoli.fr",tel:"01 40 00 11 22",cotisation:180}},
-    {id:2,nom:"Studio Montmartre",adresse:"7 Rue Lepic, 75018 Paris",type:"Studio",surface:28,image:"🏠",statut:"vacant",loyer:890,charges:80,caution:0,notes:"Travaux peinture prévus juillet.",locataire:null,syndic:null},
+var MOIS=["Jan","Fev","Mar","Avr","Mai","Jun","Jul","Aou","Sep","Oct","Nov","Dec"];
+var MOISLONG=["Janvier","Fevrier","Mars","Avril","Mai","Juin","Juillet","Aout","Septembre","Octobre","Novembre","Decembre"];
+
+var DEF={
+  props:[
+    {id:1,nom:"Appt Haussmannien",adr:"12 Rue de Rivoli, Paris",type:"Appartement",surf:78,img:"HH",stat:"loue",loyer:1850,charges:220,caution:3700,notes:"Parquet ancien.",
+     loc:{nom:"Marie Dupont",email:"marie@email.fr",tel:"06 12 34 56 78",date:"2023-03-01"},
+     syn:{nom:"Syndic Rivoli",contact:"syndic@rivoli.fr",tel:"01 40 00 11 22",cotis:180}},
+    {id:2,nom:"Studio Montmartre",adr:"7 Rue Lepic, Paris",type:"Studio",surf:28,img:"MA",stat:"vacant",loyer:890,charges:80,caution:0,notes:"Travaux peinture.",loc:null,syn:null}
   ],
   loyers:[
-    {id:1,propId:1,mois:"2024-05",montant:2070,statut:"payé",datePaiement:"2024-05-03",notes:""},
-    {id:2,propId:1,mois:"2024-06",montant:2070,statut:"payé",datePaiement:"2024-06-02",notes:""},
-    {id:3,propId:1,mois:"2024-07",montant:2070,statut:"retard",datePaiement:"",notes:"Relance envoyée le 10/07"},
-    {id:4,propId:1,mois:"2024-08",montant:2070,statut:"impayé",datePaiement:"",notes:""},
+    {id:1,pid:1,mois:"2024-05",mt:2070,stat:"paye",dp:"2024-05-03",notes:""},
+    {id:2,pid:1,mois:"2024-06",mt:2070,stat:"paye",dp:"2024-06-02",notes:""},
+    {id:3,pid:1,mois:"2024-07",mt:2070,stat:"retard",dp:"",notes:"Relance 10/07"},
+    {id:4,pid:1,mois:"2024-08",mt:2070,stat:"impaye",dp:"",notes:""}
   ],
   travaux:[
-    {id:1,propId:1,date:"2024-02-15",type:"entretien",desc:"Révision chaudière",montant:280,prestataire:"Thermix SAS",statut:"terminé"},
-    {id:2,propId:1,date:"2024-05-20",type:"travaux",desc:"Remplacement robinetterie",montant:650,prestataire:"Plomberie Martin",statut:"terminé"},
-    {id:3,propId:2,date:"2024-07-01",type:"travaux",desc:"Peinture complète",montant:1200,prestataire:"À définir",statut:"planifié"},
+    {id:1,pid:1,date:"2024-02-15",type:"entretien",desc:"Revision chaudiere",mt:280,prest:"Thermix",stat:"termine"},
+    {id:2,pid:1,date:"2024-05-20",type:"travaux",desc:"Remplacement robinetterie",mt:650,prest:"Plomberie Martin",stat:"termine"},
+    {id:3,pid:2,date:"2024-07-01",type:"travaux",desc:"Peinture complete",mt:1200,prest:"A definir",stat:"planifie"}
   ],
   courriers:[
-    {id:1,propId:1,date:"2024-07-10",type:"relance",titre:"1ère relance loyer juillet",destinataire:"Marie Dupont",statut:"envoyé",notes:"Envoi email + RAR"},
-    {id:2,propId:1,date:"2024-07-25",type:"mise_en_demeure",titre:"Mise en demeure loyer juillet",destinataire:"Marie Dupont",statut:"envoyé",notes:"AR reçu le 28/07"},
-    {id:3,propId:1,date:"2024-08-05",type:"commandement",titre:"Commandement de payer",destinataire:"Marie Dupont",statut:"en_cours",notes:"Huissier mandaté"},
+    {id:1,pid:1,date:"2024-07-10",type:"relance",titre:"1ere relance loyer juillet",dest:"Marie Dupont",stat:"envoye",notes:"Email + RAR"},
+    {id:2,pid:1,date:"2024-07-25",type:"miseendemeure",titre:"Mise en demeure juillet",dest:"Marie Dupont",stat:"envoye",notes:"AR recu 28/07"},
+    {id:3,pid:1,date:"2024-08-05",type:"commandement",titre:"Commandement de payer",dest:"Marie Dupont",stat:"encours",notes:"Huissier mandate"}
   ],
   mails:[
-    {id:1,propId:1,date:"2024-07-10",objet:"Retard paiement loyer juillet",de:"moi",a:"marie.dupont@email.fr",corps:"Madame,\n\nNous n'avons pas reçu le paiement du loyer de juillet.\n\nCordialement",tag:"loyer",lu:true,aiTriage:true},
-    {id:2,propId:1,date:"2024-07-12",objet:"RE: Retard paiement loyer juillet",de:"marie.dupont@email.fr",a:"moi",corps:"Bonjour,\n\nJe vais régulariser cette semaine.\n\nMarie Dupont",tag:"loyer",lu:true,aiTriage:true},
-    {id:3,propId:1,date:"2024-08-01",objet:"Fuite robinetterie cuisine",de:"marie.dupont@email.fr",a:"moi",corps:"Bonjour,\n\nIl y a une petite fuite sous l'évier depuis hier soir.\n\nMerci",tag:"travaux",lu:false,aiTriage:true},
+    {id:1,pid:1,date:"2024-07-10",obj:"Retard loyer juillet",de:"moi",a:"marie@email.fr",corps:"Nous n avons pas recu le loyer.\n\nCordialement",tag:"loyer",lu:true,ia:true},
+    {id:2,pid:1,date:"2024-07-12",obj:"RE: Retard loyer juillet",de:"marie@email.fr",a:"moi",corps:"Je vais regulariser.\n\nMarie",tag:"loyer",lu:true,ia:true},
+    {id:3,pid:1,date:"2024-08-01",obj:"Fuite robinetterie",de:"marie@email.fr",a:"moi",corps:"Il y a une fuite sous l evier.\n\nMerci",tag:"travaux",lu:false,ia:true}
   ],
+  charges:[],
+  saisonnier:{
+    props:[
+      {id:101,nom:"Villa Bord de Mer",adr:"12 Av. de la Plage, Nice",surf:95,img:"VL",prix_nuit:180,notes:"Piscine, vue mer"}
+    ],
+    reservations:[
+      {id:201,pid:101,debut:"2024-07-05",fin:"2024-07-12",nom:"Famille Martin",couleur:"#2196F3",prix:1260,source:"airbnb"},
+      {id:202,pid:101,debut:"2024-07-20",fin:"2024-07-27",nom:"Dupont M.",couleur:"#4CAF50",prix:1260,source:"booking"},
+      {id:203,pid:101,debut:"2024-08-03",fin:"2024-08-10",nom:"Smith J.",couleur:"#FF9800",prix:1260,source:"manuel"}
+    ],
+    charges:[
+      {id:301,pid:101,annee:2024,eau:800,electricite:1200,menage:2400,copro:600,divers:[{desc:"Internet",mt:240},{desc:"Assurance",mt:350}]}
+    ]
+  }
 };
 
-// ── STATE ──
-let state={
-  nav:"dashboard",propId:null,tab:"loyers",modal:null,
-  data:loadData()||JSON.parse(JSON.stringify(DEFAULT_DATA))
-};
+var S={nav:"db",pid:null,tab:"loyers",modal:null,spid:null,scal:{annee:new Date().getFullYear(),mois:new Date().getMonth()},data:loadD()||JSON.parse(JSON.stringify(DEF))};
+if(!S.data.charges)S.data.charges=[];
+if(!S.data.saisonnier)S.data.saisonnier={props:[],reservations:[],charges:[]};
+if(!S.data.saisonnier.charges)S.data.saisonnier.charges=[];
 
-const SP={loué:{bg:"#d4edda",text:"#155724",dot:"#28a745",label:"Loué"},vacant:{bg:"#fff3cd",text:"#856404",dot:"#ffc107",label:"Vacant"},travaux:{bg:"#fdf2f2",text:"#c0392b",dot:"#dc3545",label:"Travaux"}};
-const SL={payé:{bg:"#d4edda",text:"#155724",dot:"#28a745",label:"Payé"},attendu:{bg:"#e8effa",text:"#1a3a6a",dot:"#2563eb",label:"Attendu"},retard:{bg:"#fff3cd",text:"#856404",dot:"#ffc107",label:"En retard"},impayé:{bg:"#fdf2f2",text:"#c0392b",dot:"#dc3545",label:"Impayé"}};
-const SC={planifié:{bg:"#e8effa",text:"#1a3a6a",dot:"#2563eb"},envoyé:{bg:"#d4edda",text:"#155724",dot:"#28a745"},en_cours:{bg:"#fff3cd",text:"#856404",dot:"#ffc107"},classé:{bg:"#f3e5f5",text:"#6a1b9a",dot:"#8e24aa"}};
-const TT={entretien:{color:"#1a3a6a",bg:"#e8effa",label:"Entretien"},travaux:{color:"#c0392b",bg:"#fdf2f2",label:"Travaux"},urgence:{color:"#856404",bg:"#fff3cd",label:"Urgence"},syndic:{color:"#6a1b9a",bg:"#f3e5f5",label:"Syndic"}};
-const TC={relance:"Relance",mise_en_demeure:"Mise en demeure",commandement:"Commandement de payer",congé:"Congé donné",autre:"Autre"};
+var SPS={loue:{bg:"#d4edda",tx:"#155724",dot:"#28a745",lb:"Loue"},vacant:{bg:"#fff3cd",tx:"#856404",dot:"#ffc107",lb:"Vacant"},travaux:{bg:"#fdf2f2",tx:"#c0392b",dot:"#dc3545",lb:"Travaux"}};
+var SLS={paye:{bg:"#d4edda",tx:"#155724",dot:"#28a745",lb:"Paye"},attendu:{bg:"#e8effa",tx:"#1a3a6a",dot:"#2563eb",lb:"Attendu"},retard:{bg:"#fff3cd",tx:"#856404",dot:"#ffc107",lb:"Retard"},impaye:{bg:"#fdf2f2",tx:"#c0392b",dot:"#dc3545",lb:"Impaye"}};
+var SCS={planifie:{bg:"#e8effa",tx:"#1a3a6a",dot:"#2563eb"},envoye:{bg:"#d4edda",tx:"#155724",dot:"#28a745"},encours:{bg:"#fff3cd",tx:"#856404",dot:"#ffc107"},classe:{bg:"#f3e5f5",tx:"#6a1b9a",dot:"#8e24aa"}};
+var TTY={entretien:{c:"#1a3a6a",bg:"#e8effa",lb:"Entretien"},travaux:{c:"#c0392b",bg:"#fdf2f2",lb:"Travaux"},urgence:{c:"#856404",bg:"#fff3cd",lb:"Urgence"},syndic:{c:"#6a1b9a",bg:"#f3e5f5",lb:"Syndic"}};
+var TCR={relance:"Relance",miseendemeure:"Mise en demeure",commandement:"Commandement",conge:"Conge",autre:"Autre"};
+var COULEURS=["#2196F3","#4CAF50","#FF9800","#E91E63","#9C27B0","#00BCD4","#FF5722","#607D8B"];
 
-function bdg(s,label){return`<span class="badge" style="background:${s.bg};color:${s.text}"><span style="width:5px;height:5px;border-radius:50%;background:${s.dot};flex-shrink:0;display:inline-block;margin-right:2px"></span>${esc(label)}</span>`;}
-function chp(color,bg,label){return`<span class="chip" style="background:${bg};color:${color}">${esc(label)}</span>`;}
-function lbl(text){return`<label style="display:block;font-size:.7rem;color:#8a7968;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.28rem">${text}</label>`;}
+function bdg(s,lb){return'<span class="bdg" style="background:'+s.bg+';color:'+s.tx+'"><span style="width:5px;height:5px;border-radius:50%;background:'+s.dot+';display:inline-block;margin-right:2px"></span>'+esc(lb)+'</span>';}
+function chp(c,bg,lb){return'<span class="chp" style="background:'+bg+';color:'+c+'">'+esc(lb)+'</span>';}
+function getImg(p){var m={"HH":"&#127963;","MA":"&#127968;","VL":"&#127968;","AP":"&#127968;"};return m[p.img]||"&#127968;";}
 
-// ── RENDER PRINCIPAL ──
+// Calcul jours entre 2 dates
+function daysBetween(d1,d2){return Math.round((new Date(d2)-new Date(d1))/(1000*60*60*24));}
+
+// Revenus reservations d'une annee
+function revsAnnee(pid,annee){
+  var tot=0;
+  for(var i=0;i<S.data.saisonnier.reservations.length;i++){
+    var r=S.data.saisonnier.reservations[i];
+    if(r.pid===pid&&r.debut.startsWith(String(annee)))tot+=r.prix||0;
+  }
+  return tot;
+}
+
+// Charges saisonniere d'une annee
+function chargesAnnee(pid,annee){
+  for(var i=0;i<S.data.saisonnier.charges.length;i++){
+    var c=S.data.saisonnier.charges[i];
+    if(c.pid===pid&&c.annee===annee)return c;
+  }
+  return null;
+}
+
+function totalChargesSais(c){
+  if(!c)return 0;
+  var t=((c.eau||0)+(c.electricite||0)+(c.menage||0)+(c.copro||0));
+  if(c.divers)for(var i=0;i<c.divers.length;i++)t+=+c.divers[i].mt||0;
+  return t;
+}
+
 function render(){
-  const d=state.data;
-  const prop=d.properties.find(p=>p.id===state.propId);
-  const loues=d.properties.filter(p=>p.statut==="loué");
-  const rev=loues.reduce((s,p)=>s+p.loyer,0);
-  const charges=loues.reduce((s,p)=>s+p.charges,0);
-  const syndic=loues.reduce((s,p)=>s+(p.syndic?.cotisation||0),0);
-  const imp=d.loyers.filter(l=>l.statut==="impayé").reduce((s,l)=>s+l.montant,0);
-  const trCost=d.travaux.reduce((s,t)=>s+(+t.montant||0),0);
-  const unread=d.mails.filter(m=>!m.lu).length;
-  const alertCount=d.loyers.filter(l=>l.statut==="impayé"||l.statut==="retard").length;
+  var d=S.data;
+  var prop=null;
+  for(var i=0;i<d.props.length;i++){if(d.props[i].id===S.pid){prop=d.props[i];break;}}
+  var rev=0,ch=0,sy=0;
+  for(var i=0;i<d.props.length;i++){var p=d.props[i];if(p.stat==="loue"){rev+=p.loyer;ch+=p.charges;sy+=(p.syn?p.syn.cotis:0);}}
+  var imp=0;for(var i=0;i<d.loyers.length;i++){if(d.loyers[i].stat==="impaye")imp+=d.loyers[i].mt;}
+  var trc=0;for(var i=0;i<d.travaux.length;i++)trc+=(+d.travaux[i].mt||0);
+  var unr=0;for(var i=0;i<d.mails.length;i++){if(!d.mails[i].lu)unr++;}
+  var alc=0;for(var i=0;i<d.loyers.length;i++){if(d.loyers[i].stat==="impaye"||d.loyers[i].stat==="retard")alc++;}
 
-  document.getElementById("backBtn").style.display=(state.nav==="detail"||state.nav==="more")?"block":"none";
+  document.getElementById("backBtn").style.display=(S.nav==="det"||S.nav==="sdet")?"block":"none";
+  document.getElementById("addBtn").style.display=(S.nav==="sais")?"none":"block";
+  document.getElementById("addBtn").onclick=(S.nav==="sais")?null:function(){opAP();};
 
-  // Bottom nav
-  const navItems=[["dashboard","🏠","Accueil",0],["biens","🏢","Biens",0],["loyers_g","💶","Loyers",alertCount],["travaux_g","🔧","Travaux",0],["more","⋯","Plus",unread]];
-  document.getElementById("bottomnav").innerHTML=navItems.map(([v,icon,label,b])=>`
-    <button class="navbtn ${state.nav===v?"on":""}" onclick="goNav('${v}')">
-      <div style="position:relative;display:inline-block">
-        <span class="ni">${icon}</span>
-        ${b>0?`<span style="position:absolute;top:-3px;right:-6px;background:#e53935;color:#fff;font-size:.52rem;padding:1px 4px;border-radius:10px;min-width:14px;text-align:center;line-height:1.4">${b}</span>`:""}
-      </div>
-      <span>${label}</span>
-    </button>`).join("");
+  var navs=[["db","&#127968;","Accueil",0],["biens","&#127962;","Biens",0],["loyers","&#128182;","Loyers",alc],["charges","&#128200;","Charges",0],["sais","&#9728;","Saisonnier",0],["more","&#8943;","Plus",unr]];
+  var nb="";
+  for(var i=0;i<navs.length;i++){
+    var nv=navs[i];
+    nb+='<button class="nb '+(S.nav===nv[0]||((S.nav==="det"||S.nav==="sdet")&&nv[0]==="biens")?"on":"")+'" onclick="gn(\''+nv[0]+'\')"><div style="position:relative;display:inline-block"><span class="ic">'+nv[1]+'</span>'+(nv[3]>0?'<span style="position:absolute;top:-3px;right:-6px;background:#e53935;color:#fff;font-size:.5rem;padding:1px 4px;border-radius:10px">'+nv[3]+'</span>':"")+'</div><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:52px">'+nv[2]+'</span></button>';
+  }
+  document.getElementById("bnav").innerHTML=nb;
 
-  let html="";
-  const main=document.getElementById("main");
+  var h="";
+  var main=document.getElementById("main");
 
   // ══ DASHBOARD ══
-  if(state.nav==="dashboard"){
-    const alerts=[];
-    d.loyers.filter(l=>l.statut==="impayé").forEach(l=>{const p=d.properties.find(x=>x.id===l.propId);if(p)alerts.push({type:"danger",text:`Impayé ${moisLabel(l.mois)} — ${p.nom}`,propId:p.id,tab:"loyers"});});
-    d.loyers.filter(l=>l.statut==="retard").forEach(l=>{const p=d.properties.find(x=>x.id===l.propId);if(p)alerts.push({type:"warn",text:`Retard ${moisLabel(l.mois)} — ${p.nom}`,propId:p.id,tab:"loyers"});});
-    d.mails.filter(m=>!m.lu).forEach(m=>{const p=d.properties.find(x=>x.id===m.propId);if(p)alerts.push({type:"info",text:`Non lu : "${m.objet}"`,propId:p.id,tab:"mails"});});
-
-    html+=`<div style="margin-bottom:1.1rem"><h1 style="font-size:1.25rem;font-weight:700;color:#1a3a2a;margin-bottom:.15rem">Bonjour 👋</h1><p style="color:#8a7968;font-size:.8rem">${new Date().toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"})}</p></div>`;
-    html+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1rem">`;
-    [["💶","Revenus/mois",fmt(rev),"loyers bruts",false],["📈","Net estimé",fmt(rev-charges-syndic),"après charges",false],["🏢","Occupation",`${d.properties.length>0?Math.round(loues.length/d.properties.length*100):0}%`,`${loues.length} loués · ${d.properties.filter(p=>p.statut==="vacant").length} vacants`,false],["⚠️","Impayés",fmt(imp),"à recouvrer",imp>0]].forEach(([icon,label,value,sub,danger])=>{
-      html+=`<div class="kpi" style="border-left:3px solid ${danger?"#c0392b":"#1a3a2a"}"><div style="font-size:1.1rem;margin-bottom:.3rem">${icon}</div><div style="font-size:.62rem;color:#8a7968;text-transform:uppercase;letter-spacing:.05em">${label}</div><div style="font-size:1.15rem;font-weight:700;color:${danger?"#c0392b":"#2d2820"};margin:.2rem 0 .1rem">${value}</div><div style="font-size:.65rem;color:#a89a88">${sub}</div></div>`;
-    });
-    html+=`</div>`;
-
-    if(alerts.length>0){
-      html+=`<div class="card" style="margin-bottom:1rem"><div class="sec-head"><h3 class="sec-title">⚡ Alertes</h3></div>`;
-      alerts.forEach(a=>{html+=`<div class="row" onclick="goDetail(${a.propId},'${a.tab}')" style="cursor:pointer"><span style="width:7px;height:7px;border-radius:50%;background:${a.type==="danger"?"#e53935":a.type==="warn"?"#ff9800":"#1e88e5"};flex-shrink:0"></span><span style="font-size:.83rem;color:#2d2820;flex:1">${esc(a.text)}</span><span style="color:#a89a88">›</span></div>`;});
-      html+=`</div>`;
-    }
-
-    html+=`<div class="card" style="margin-bottom:1rem"><div class="sec-head"><h3 class="sec-title">🏢 Mes biens</h3><button class="add-btn" onclick="openAddProp()">+ Ajouter</button></div>`;
-    d.properties.forEach(p=>{
-      const sc=SP[p.statut]||SP.vacant;
-      const impC=d.loyers.filter(l=>l.propId===p.id&&(l.statut==="impayé"||l.statut==="retard")).length;
-      html+=`<div class="row" onclick="goDetail(${p.id})" style="cursor:pointer"><span style="font-size:1.6rem">${p.image}</span><div style="flex:1;min-width:0"><div style="font-weight:600;font-size:.88rem;color:#2d2820;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(p.nom)}</div><div style="font-size:.72rem;color:#8a7968">${p.type} · ${p.surface}m²${p.locataire?" · "+esc(p.locataire.nom):""}</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">${bdg(sc,sc.label)}${impC>0?bdg({bg:"#fdf2f2",text:"#c0392b",dot:"#dc3545"},impC+" impayé"+(impC>1?"s":"")):""}
-      </div></div>`;
-    });
-    html+=`</div>`;
-
-    const withLoc=d.properties.filter(p=>p.locataire);
-    if(withLoc.length>0){
-      html+=`<div class="card"><div class="sec-head"><h3 class="sec-title">👤 Locataires</h3></div>`;
-      withLoc.forEach(p=>{html+=`<div class="row" onclick="goDetail(${p.id})" style="cursor:pointer"><div style="width:34px;height:34px;border-radius:50%;background:#e8f4ed;display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:700;color:#1a3a2a;flex-shrink:0">${p.locataire.nom[0]}</div><div style="flex:1"><div style="font-weight:600;font-size:.85rem;color:#2d2820">${esc(p.locataire.nom)}</div><div style="font-size:.72rem;color:#8a7968">${esc(p.nom)}</div></div><div style="text-align:right"><div style="font-weight:700;color:#1a3a2a;font-size:.85rem">${fmt(p.loyer)}</div><div style="font-size:.65rem;color:#a89a88">/mois</div></div></div>`;});
-      html+=`</div>`;
-    }
+  if(S.nav==="db"){
+    h+='<div style="margin-bottom:1rem"><h1 style="font-size:1.2rem;font-weight:700;color:#1a3a2a">Bonjour &#128075;</h1><p style="color:#8a7968;font-size:.8rem">'+new Date().toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"})+'</p></div>';
+    var totSais=0;
+    for(var i=0;i<d.saisonnier.props.length;i++)totSais+=revsAnnee(d.saisonnier.props[i].id,new Date().getFullYear());
+    h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1rem">';
+    var kpis=[["&#128182;","Revenus/mois",fmt(rev),"loyers"],["&#128200;","Net/mois",fmt(rev-ch-sy),"apres charges"],["&#9728;","Saisonnier",fmt(totSais),"revenus "+new Date().getFullYear()],["&#9888;","Impayes",fmt(imp),"a recouvrer",imp>0]];
+    for(var i=0;i<kpis.length;i++){var k=kpis[i];h+='<div class="kpi" style="border-left:3px solid '+(k[4]?"#c0392b":"#1a3a2a")+'"><div style="font-size:1.1rem;margin-bottom:.3rem">'+k[0]+'</div><div style="font-size:.62rem;color:#8a7968;text-transform:uppercase">'+k[1]+'</div><div style="font-size:1.1rem;font-weight:700;color:'+(k[4]?"#c0392b":"#2d2820")+';margin:.2rem 0 .1rem">'+k[2]+'</div><div style="font-size:.65rem;color:#a89a88">'+k[3]+'</div></div>';}
+    h+='</div>';
+    var als=[];
+    for(var i=0;i<d.loyers.length;i++){var l=d.loyers[i];if(l.stat==="impaye"||l.stat==="retard"){for(var j=0;j<d.props.length;j++){if(d.props[j].id===l.pid){als.push({t:l.stat==="impaye"?"d":"w",tx:(l.stat==="impaye"?"Impaye ":"Retard ")+ml(l.mois)+" - "+d.props[j].nom,pid:d.props[j].id});break;}}}}
+    if(als.length>0){h+='<div class="card"><div class="sh"><h3 class="st">&#9889; Alertes</h3></div>';for(var i=0;i<als.length;i++){var a=als[i];h+='<div class="row" onclick="gd('+a.pid+',\'loyers\')" style="cursor:pointer"><span style="width:7px;height:7px;border-radius:50%;background:'+(a.t==="d"?"#e53935":"#ff9800")+';flex-shrink:0"></span><span style="font-size:.83rem;color:#2d2820;flex:1">'+esc(a.tx)+'</span><span>&#8250;</span></div>';}h+='</div>';}
+    h+='<div class="card"><div class="sh"><h3 class="st">&#127962; Mes biens</h3><button class="ab" onclick="opAP()">+ Ajouter</button></div>';
+    for(var i=0;i<d.props.length;i++){var p=d.props[i];var sc=SPS[p.stat]||SPS.vacant;var ic=0;for(var j=0;j<d.loyers.length;j++){if(d.loyers[j].pid===p.id&&(d.loyers[j].stat==="impaye"||d.loyers[j].stat==="retard"))ic++;}h+='<div class="row" onclick="gd('+p.id+')" style="cursor:pointer"><span style="font-size:1.5rem">'+getImg(p)+'</span><div style="flex:1;min-width:0"><div style="font-weight:600;font-size:.88rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(p.nom)+'</div><div style="font-size:.72rem;color:#8a7968">'+p.type+' &middot; '+p.surf+'m2'+(p.loc?' &middot; '+esc(p.loc.nom):"")+'</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">'+bdg(sc,sc.lb)+(ic>0?bdg({bg:"#fdf2f2",tx:"#c0392b",dot:"#dc3545"},ic+" imp."):"")+'</div></div>';}
+    h+='</div>';
   }
 
   // ══ BIENS ══
-  else if(state.nav==="biens"){
-    html+=`<h1 style="font-size:1.2rem;font-weight:700;color:#1a3a2a;margin-bottom:1rem">${d.properties.length} bien${d.properties.length>1?"s":""}</h1>`;
-    d.properties.forEach(p=>{
-      const sc=SP[p.statut]||SP.vacant;
-      const impC=d.loyers.filter(l=>l.propId===p.id&&(l.statut==="impayé"||l.statut==="retard")).length;
-      const trC=d.travaux.filter(t=>t.propId===p.id).reduce((s,t)=>s+(+t.montant||0),0);
-      const typeCol={Appartement:"#e8f4fd",Studio:"#fef9e7",Maison:"#e8f8f5",Commerce:"#fdf2f8",Parking:"#f2f3f4"}[p.type]||"#f5f2ed";
-      html+=`<div class="prop-card" onclick="goDetail(${p.id})">
-        <div style="background:${typeCol};padding:1.1rem 1.1rem .8rem;display:flex;justify-content:space-between;align-items:flex-start">
-          <div style="display:flex;align-items:center;gap:.65rem"><span style="font-size:2rem">${p.image}</span><div><div style="font-weight:700;font-size:.95rem;color:#2d2820">${esc(p.nom)}</div><div style="font-size:.72rem;color:#8a7968">${p.type} · ${p.surface}m²</div></div></div>
-          ${bdg(sc,sc.label)}
-        </div>
-        <div style="padding:.85rem 1.1rem">
-          <div style="font-size:.75rem;color:#8a7968;margin-bottom:.7rem">📍 ${esc(p.adresse)}</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.6rem">
-            <div style="background:#f5f2ed;border-radius:.55rem;padding:.55rem .7rem"><div style="font-size:.6rem;color:#a89a88;text-transform:uppercase;letter-spacing:.05em">Loyer CC</div><div style="font-weight:700;color:#1a3a2a;font-size:.9rem">${fmt(p.loyer+p.charges)}</div></div>
-            <div style="background:#f5f2ed;border-radius:.55rem;padding:.55rem .7rem"><div style="font-size:.6rem;color:#a89a88;text-transform:uppercase;letter-spacing:.05em">Travaux</div><div style="font-weight:700;color:#2d2820;font-size:.9rem">${fmt(trC)}</div></div>
-          </div>
-          <div style="display:flex;gap:.4rem;flex-wrap:wrap">
-            ${p.locataire?chp("#1a3a2a","#e8f4ed","👤 "+p.locataire.nom):""}
-            ${impC>0?chp("#c0392b","#fdf2f2","⚠️ "+impC+" impayé"+(impC>1?"s":"")):""}
-          </div>
-        </div>
-      </div>`;
-    });
+  else if(S.nav==="biens"){
+    h+='<h1 style="font-size:1.2rem;font-weight:700;color:#1a3a2a;margin-bottom:1rem">'+d.props.length+' bien'+(d.props.length>1?"s":"")+'</h1>';
+    for(var i=0;i<d.props.length;i++){
+      var p=d.props[i];var sc=SPS[p.stat]||SPS.vacant;
+      var ic=0;for(var j=0;j<d.loyers.length;j++){if(d.loyers[j].pid===p.id&&(d.loyers[j].stat==="impaye"||d.loyers[j].stat==="retard"))ic++;}
+      var tr=0;for(var j=0;j<d.travaux.length;j++){if(d.travaux[j].pid===p.id)tr+=+d.travaux[j].mt||0;}
+      h+='<div style="background:#fff;border-radius:1rem;box-shadow:0 2px 12px rgba(0,0,0,.07);overflow:hidden;cursor:pointer;margin-bottom:1rem" onclick="gd('+p.id+')">';
+      h+='<div style="background:#e8f4fd;padding:1rem;display:flex;justify-content:space-between;align-items:flex-start"><div style="display:flex;align-items:center;gap:.65rem"><span style="font-size:2rem">'+getImg(p)+'</span><div><div style="font-weight:700;font-size:.95rem">'+esc(p.nom)+'</div><div style="font-size:.72rem;color:#8a7968">'+p.type+' &middot; '+p.surf+'m2</div></div></div>'+bdg(sc,sc.lb)+'</div>';
+      h+='<div style="padding:.85rem"><div style="font-size:.75rem;color:#8a7968;margin-bottom:.7rem">'+esc(p.adr)+'</div>';
+      h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.6rem">';
+      h+='<div style="background:#f5f2ed;border-radius:.55rem;padding:.55rem .7rem"><div style="font-size:.6rem;color:#a89a88;text-transform:uppercase">Loyer CC</div><div style="font-weight:700;color:#1a3a2a">'+fmt(p.loyer+p.charges)+'</div></div>';
+      h+='<div style="background:#f5f2ed;border-radius:.55rem;padding:.55rem .7rem"><div style="font-size:.6rem;color:#a89a88;text-transform:uppercase">Travaux</div><div style="font-weight:700">'+fmt(tr)+'</div></div></div>';
+      h+='<div style="display:flex;gap:.4rem;flex-wrap:wrap">'+(p.loc?chp("#1a3a2a","#e8f4ed","&#128100; "+p.loc.nom):"")+(ic>0?chp("#c0392b","#fdf2f2","&#9888; "+ic+" imp."):"")+'</div></div></div>';
+    }
   }
 
-  // ══ DETAIL ══
-  else if(state.nav==="detail"&&prop){
-    const pL=d.loyers.filter(l=>l.propId===state.propId).sort((a,b)=>b.mois.localeCompare(a.mois));
-    const pT=d.travaux.filter(t=>t.propId===state.propId).sort((a,b)=>b.date.localeCompare(a.date));
-    const pC=d.courriers.filter(c=>c.propId===state.propId).sort((a,b)=>b.date.localeCompare(a.date));
-    const pM=d.mails.filter(m=>m.propId===state.propId).sort((a,b)=>b.date.localeCompare(a.date));
-    const impT=pL.filter(l=>l.statut==="impayé"||l.statut==="retard").reduce((s,l)=>s+l.montant,0);
-    const trT=pT.reduce((s,t)=>s+(+t.montant||0),0);
-    const sc=SP[prop.statut]||SP.vacant;
+  // ══ DETAIL BIEN ══
+  else if(S.nav==="det"&&prop){
+    var pL=[],pT=[],pC=[],pM=[];
+    for(var i=0;i<d.loyers.length;i++){if(d.loyers[i].pid===S.pid)pL.push(d.loyers[i]);}
+    for(var i=0;i<d.travaux.length;i++){if(d.travaux[i].pid===S.pid)pT.push(d.travaux[i]);}
+    for(var i=0;i<d.courriers.length;i++){if(d.courriers[i].pid===S.pid)pC.push(d.courriers[i]);}
+    for(var i=0;i<d.mails.length;i++){if(d.mails[i].pid===S.pid)pM.push(d.mails[i]);}
+    pL.sort(function(a,b){return b.mois.localeCompare(a.mois);});
+    pT.sort(function(a,b){return b.date.localeCompare(a.date);});
+    pC.sort(function(a,b){return b.date.localeCompare(a.date);});
+    pM.sort(function(a,b){return b.date.localeCompare(a.date);});
+    var impT=0;for(var i=0;i<pL.length;i++){if(pL[i].stat==="impaye"||pL[i].stat==="retard")impT+=pL[i].mt;}
+    var trT=0;for(var i=0;i<pT.length;i++)trT+=+pT[i].mt||0;
+    var sc=SPS[prop.stat]||SPS.vacant;
+    var unrM=0;for(var i=0;i<pM.length;i++){if(!pM[i].lu)unrM++;}
+    var impL=0;for(var i=0;i<pL.length;i++){if(pL[i].stat==="impaye")impL++;}
 
-    html+=`<div style="display:flex;align-items:center;gap:.85rem;margin-bottom:1rem">
-      <span style="font-size:2.5rem">${prop.image}</span>
-      <div><h1 style="font-size:1.15rem;font-weight:700;color:#1a3a2a">${esc(prop.nom)}</h1><p style="color:#8a7968;font-size:.75rem">📍 ${esc(prop.adresse)}</p>${bdg(sc,sc.label)}</div>
-      <button onclick="openEditProp(${prop.id})" style="margin-left:auto;background:#1a3a2a;color:#fff;padding:.4rem .9rem;border-radius:.65rem;font-size:.78rem;cursor:pointer">✏️ Modifier</button>
-    </div>`;
+    h+='<div style="display:flex;align-items:center;gap:.85rem;margin-bottom:1rem"><span style="font-size:2.5rem">'+getImg(prop)+'</span><div><h1 style="font-size:1.1rem;font-weight:700;color:#1a3a2a">'+esc(prop.nom)+'</h1><p style="color:#8a7968;font-size:.75rem">'+esc(prop.adr)+'</p>'+bdg(sc,sc.lb)+'</div><button onclick="opEP('+prop.id+')" style="margin-left:auto;background:#1a3a2a;color:#fff;padding:.4rem .9rem;border-radius:.65rem;font-size:.78rem;cursor:pointer">&#9998; Modif.</button></div>';
+    h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin-bottom:1rem">';
+    var kp=[["Loyer HC",fmt(prop.loyer),false,false],["Charges",fmt(prop.charges),false,false],["Net/mois",fmt(prop.loyer-prop.charges-(prop.syn?prop.syn.cotis:0)),false,true],["Caution",fmt(prop.caution),false,false],["Surface",prop.surf+"m2",false,false],["Impayes",fmt(impT),impT>0,false]];
+    for(var i=0;i<kp.length;i++){var k=kp[i];h+='<div style="background:'+(k[2]?"#fdf2f2":k[3]?"#e8f4ed":"#f5f2ed")+';border-radius:.65rem;padding:.6rem .7rem"><div style="font-size:.58rem;color:#a89a88;text-transform:uppercase">'+k[0]+'</div><div style="font-weight:700;color:'+(k[2]?"#c0392b":k[3]?"#1a3a2a":"#2d2820")+';font-size:.88rem;margin-top:.15rem">'+k[1]+'</div></div>';}
+    h+='</div>';
+    h+='<div class="card" style="margin-bottom:1rem;padding:.85rem"><div style="font-size:.7rem;color:#8a7968;text-transform:uppercase;margin-bottom:.6rem">Statut</div><div style="display:flex;gap:.5rem">';
+    var sts=["loue","vacant","travaux"];var stl=["Loue","Vacant","Travaux"];
+    for(var i=0;i<sts.length;i++){var ss=SPS[sts[i]];h+='<button onclick="chSt(\''+sts[i]+'\')" style="flex:1;padding:.5rem .4rem;border-radius:.6rem;border:1.5px solid '+(prop.stat===sts[i]?ss.dot:"#ddd")+';background:'+(prop.stat===sts[i]?ss.bg:"#faf9f7")+';color:'+(prop.stat===sts[i]?ss.tx:"#5a4e42")+';font-size:.78rem;font-weight:'+(prop.stat===sts[i]?700:400)+';cursor:pointer">'+stl[i]+'</button>';}
+    h+='</div></div>';
+    h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1rem">';
+    h+='<div class="card" style="padding:.85rem"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem"><div style="font-size:.7rem;font-weight:700;color:#1a3a2a;text-transform:uppercase">&#128100; Locataire</div><button onclick="opEP('+prop.id+',1)" style="background:#f5f2ed;color:#5a4e42;font-size:.65rem;padding:.2rem .5rem;border-radius:.4rem;cursor:pointer">&#9998;</button></div>';
+    if(prop.loc){var lf=[["Nom",prop.loc.nom],["Tel",prop.loc.tel],["Entree",fd(prop.loc.date)]];for(var i=0;i<lf.length;i++){h+='<div style="margin-bottom:.35rem"><div style="font-size:.62rem;color:#a89a88">'+lf[i][0]+'</div><div style="font-size:.78rem;font-weight:600;word-break:break-all">'+esc(lf[i][1])+'</div></div>';}}else h+='<div class="empty" style="padding:.75rem">Aucun</div>';
+    h+='</div>';
+    h+='<div class="card" style="padding:.85rem"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem"><div style="font-size:.7rem;font-weight:700;color:#1a3a2a;text-transform:uppercase">&#127962; Syndic</div><button onclick="opEP('+prop.id+',2)" style="background:#f5f2ed;color:#5a4e42;font-size:.65rem;padding:.2rem .5rem;border-radius:.4rem;cursor:pointer">&#9998;</button></div>';
+    if(prop.syn){var sf=[["Nom",prop.syn.nom],["Tel",prop.syn.tel],["Cotis.",fmt(prop.syn.cotis)+"/mois"]];for(var i=0;i<sf.length;i++){h+='<div style="margin-bottom:.35rem"><div style="font-size:.62rem;color:#a89a88">'+sf[i][0]+'</div><div style="font-size:.78rem;font-weight:600;word-break:break-all">'+esc(sf[i][1])+'</div></div>';}}else h+='<div class="empty" style="padding:.75rem">Aucun</div>';
+    h+='</div></div>';
+    if(prop.notes)h+='<div class="card" style="margin-bottom:1rem;padding:.85rem;background:#fffdf0;border:1px solid rgba(184,147,10,.2)"><div style="font-size:.72rem;color:#b8930a;font-weight:700;margin-bottom:.3rem">Notes</div><div style="font-size:.82rem;color:#5a4e42">'+esc(prop.notes)+'</div></div>';
 
-    html+=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin-bottom:1rem">`;
-    [["Loyer HC",fmt(prop.loyer),false,false],["Charges",fmt(prop.charges),false,false],["Net/mois",fmt(prop.loyer-prop.charges-(prop.syndic?.cotisation||0)),false,true],["Caution",fmt(prop.caution),false,false],["Surface",prop.surface+"m²",false,false],["Impayés",fmt(impT),impT>0,false]].forEach(([l,v,danger,accent])=>{
-      html+=`<div style="background:${danger?"#fdf2f2":accent?"#e8f4ed":"#f5f2ed"};border-radius:.65rem;padding:.6rem .7rem"><div style="font-size:.58rem;color:#a89a88;text-transform:uppercase;letter-spacing:.04em">${l}</div><div style="font-weight:700;color:${danger?"#c0392b":accent?"#1a3a2a":"#2d2820"};font-size:.88rem;margin-top:.15rem">${v}</div></div>`;
-    });
-    html+=`</div>`;
+    h+='<div class="card"><div style="display:flex;gap:.3rem;margin-bottom:1rem;overflow-x:auto;padding-bottom:.25rem">';
+    var tabs=[["loyers","&#128182; Loyers",impL],["travaux","&#128295; Travaux",0],["courriers","&#128140; Courriers",0],["mails","&#9993; Mails",unrM]];
+    for(var i=0;i<tabs.length;i++){var t=tabs[i];h+='<button class="tab '+(S.tab===t[0]?"on":"")+'" onclick="st(\''+t[0]+'\')">'+t[1]+(t[2]>0?'<span style="margin-left:3px;background:#e53935;color:#fff;font-size:.58rem;padding:0 4px;border-radius:6px">'+t[2]+'</span>':"")+'</button>';}
+    h+='</div>';
 
-    html+=`<div class="card" style="margin-bottom:1rem;padding:.85rem"><div style="font-size:.7rem;color:#8a7968;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.6rem">Statut du bien</div><div style="display:flex;gap:.5rem">`;
-    ["loué","vacant","travaux"].forEach(s=>{
-      const sc2=SP[s];
-      html+=`<button onclick="changeStatut('${s}')" style="flex:1;padding:.5rem .4rem;border-radius:.6rem;border:1.5px solid ${prop.statut===s?sc2.dot:"#ddd8cf"};background:${prop.statut===s?sc2.bg:"#faf9f7"};color:${prop.statut===s?sc2.text:"#5a4e42"};font-size:.78rem;font-weight:${prop.statut===s?700:400};cursor:pointer">${cap(s)}</button>`;
-    });
-    html+=`</div></div>`;
-
-    html+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1rem">`;
-    html+=`<div class="card" style="padding:.85rem"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem"><div style="font-size:.7rem;font-weight:700;color:#1a3a2a;text-transform:uppercase;letter-spacing:.05em">👤 Locataire</div><button onclick="openEditProp(${prop.id},'loc')" style="background:#f5f2ed;color:#5a4e42;font-size:.65rem;padding:.2rem .5rem;border-radius:.4rem;cursor:pointer">✏️</button></div>`;
-    if(prop.locataire){[["Nom",prop.locataire.nom],["Tél",prop.locataire.tel],["Entrée",fmtDate(prop.locataire.dateEntree)]].forEach(([l,v])=>{html+=`<div style="margin-bottom:.35rem"><div style="font-size:.62rem;color:#a89a88">${l}</div><div style="font-size:.78rem;font-weight:600;color:#2d2820;word-break:break-all">${esc(v)}</div></div>`;});}
-    else html+=`<div class="empty" style="padding:.75rem">👤<br>Aucun</div>`;
-    html+=`</div>`;
-
-    html+=`<div class="card" style="padding:.85rem"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem"><div style="font-size:.7rem;font-weight:700;color:#1a3a2a;text-transform:uppercase;letter-spacing:.05em">🏢 Syndic</div><button onclick="openEditProp(${prop.id},'syn')" style="background:#f5f2ed;color:#5a4e42;font-size:.65rem;padding:.2rem .5rem;border-radius:.4rem;cursor:pointer">✏️</button></div>`;
-    if(prop.syndic){[["Nom",prop.syndic.nom],["Tél",prop.syndic.tel],["Cotis.",fmt(prop.syndic.cotisation)+"/mois"]].forEach(([l,v])=>{html+=`<div style="margin-bottom:.35rem"><div style="font-size:.62rem;color:#a89a88">${l}</div><div style="font-size:.78rem;font-weight:600;color:#2d2820;word-break:break-all">${esc(v)}</div></div>`;});}
-    else html+=`<div class="empty" style="padding:.75rem">🏢<br>Aucun</div>`;
-    html+=`</div></div>`;
-
-    if(prop.notes)html+=`<div class="card" style="margin-bottom:1rem;padding:.85rem;background:#fffdf0;border:1px solid rgba(184,147,10,.2)"><div style="font-size:.72rem;color:#b8930a;font-weight:700;margin-bottom:.3rem">📝 Notes</div><div style="font-size:.82rem;color:#5a4e42">${esc(prop.notes)}</div></div>`;
-
-    // TABS
-    html+=`<div class="card">`;
-    html+=`<div style="display:flex;gap:.3rem;margin-bottom:1rem;overflow-x:auto;padding-bottom:.25rem">`;
-    [["loyers","💶 Loyers"],["travaux","🔧 Travaux"],["courriers","📬 Courriers"],["mails","✉️ Mails"]].forEach(([t,l])=>{
-      const impL=t==="loyers"?pL.filter(x=>x.statut==="impayé").length:0;
-      const unrM=t==="mails"?pM.filter(m=>!m.lu).length:0;
-      html+=`<button class="tab ${state.tab===t?"on":""}" onclick="setTab('${t}')">${l}${impL>0?`<span style="margin-left:3px;background:#e53935;color:#fff;font-size:.58rem;padding:0 4px;border-radius:6px">${impL}</span>`:""}${unrM>0?`<span style="margin-left:3px;background:#1e88e5;color:#fff;font-size:.58rem;padding:0 4px;border-radius:6px">${unrM}</span>`:""}</button>`;
-    });
-    html+=`</div>`;
-
-    // Tab loyers
-    if(state.tab==="loyers"){
-      html+=`<div class="sec-head"><h3 class="sec-title">Suivi des loyers</h3><button class="add-btn" onclick="openModal('addLoyer')">+ Ajouter</button></div>`;
-      if(pL.length===0)html+=`<div class="empty">💶<br>Aucun loyer enregistré</div>`;
-      pL.forEach(l=>{
-        const sl=SL[l.statut]||SL.attendu;
-        html+=`<div class="row">
-          <div style="flex:1"><div style="font-weight:600;font-size:.85rem;color:#2d2820">${moisLabel(l.mois)}</div>${l.notes?`<div style="font-size:.7rem;color:#a89a88">${esc(l.notes)}</div>`:""}</div>
-          <span style="font-weight:700;color:#2d2820;font-size:.85rem">${fmt(l.montant)}</span>
-          ${bdg(sl,sl.label)}
-          ${l.statut!=="payé"?`<select onchange="updateLoyerStatut(${l.id},this.value)" style="font-size:.72rem;padding:.25rem .4rem;border-radius:.45rem;border:1px solid #ddd8cf;background:#faf9f7;color:#2d2820;cursor:pointer;max-width:90px">
-            <option value="attendu"${l.statut==="attendu"?" selected":""}>Attendu</option>
-            <option value="retard"${l.statut==="retard"?" selected":""}>Retard</option>
-            <option value="impayé"${l.statut==="impayé"?" selected":""}>Impayé</option>
-            <option value="payé">✓ Payé</option>
-          </select>`:""}
-        </div>`;
-      });
-      if(impT>0)html+=`<div style="margin-top:.75rem;background:#fdf2f2;border-radius:.65rem;padding:.75rem;display:flex;justify-content:space-between;align-items:center"><span style="color:#c0392b;font-weight:600;font-size:.85rem">⚠️ Total impayés</span><span style="color:#c0392b;font-weight:700">${fmt(impT)}</span></div>`;
+    if(S.tab==="loyers"){
+      h+='<div class="sh"><h3 class="st">Suivi des loyers</h3><button class="ab" onclick="om(\'al\')">+ Loyer</button></div>';
+      if(pL.length===0){
+        h+='<div class="empty">&#128182;<br>Aucun loyer enregistre<br><small style="font-size:.75rem;color:#a89a88">Cliquez + Loyer pour ajouter</small></div>';
+      }else{
+        for(var i=0;i<pL.length;i++){
+          var l=pL[i];var sl=SLS[l.stat]||SLS.attendu;
+          h+='<div class="row"><div style="flex:1"><div style="font-weight:600;font-size:.85rem">'+ml(l.mois)+'</div>'+(l.dp?'<div style="font-size:.7rem;color:#8a7968">Verse le '+fd(l.dp)+'</div>':"")+(l.notes?'<div style="font-size:.7rem;color:#a89a88">'+esc(l.notes)+'</div>':"")+'</div><span style="font-weight:700;font-size:.88rem;color:#1a3a2a">'+fmt(l.mt)+'</span>'+bdg(sl,sl.lb)+(l.stat!=="paye"?'<select onchange="ulS('+l.id+',this.value)" style="font-size:.72rem;padding:.25rem .4rem;border-radius:.45rem;border:1px solid #ddd;background:#faf9f7;cursor:pointer;max-width:85px"><option value="attendu"'+(l.stat==="attendu"?" selected":"")+'>Attendu</option><option value="retard"'+(l.stat==="retard"?" selected":"")+'>Retard</option><option value="impaye"'+(l.stat==="impaye"?" selected":"")+'>Impaye</option><option value="paye">&#10003; Paye</option></select>':"")+'</div>';
+        }
+        if(impT>0)h+='<div style="margin-top:.75rem;background:#fdf2f2;border-radius:.65rem;padding:.75rem;display:flex;justify-content:space-between"><span style="color:#c0392b;font-weight:600;font-size:.85rem">Total impayes</span><span style="color:#c0392b;font-weight:700">'+fmt(impT)+'</span></div>';
+      }
     }
-
-    // Tab travaux
-    if(state.tab==="travaux"){
-      html+=`<div class="sec-head"><h3 class="sec-title">Entretien & Travaux</h3><button class="add-btn" onclick="openModal('addTravaux')">+ Ajouter</button></div>`;
-      if(pT.length===0)html+=`<div class="empty">🔧<br>Aucune intervention</div>`;
-      pT.forEach(t=>{
-        const tc=TT[t.type]||TT.entretien;
-        const st=SC[t.statut]||SC.envoyé;
-        html+=`<div class="row">${chp(tc.color,tc.bg,tc.label)}<div style="flex:1"><div style="font-weight:600;font-size:.85rem;color:#2d2820">${esc(t.desc)}</div><div style="font-size:.7rem;color:#8a7968">${esc(t.prestataire)} · ${fmtDate(t.date)}</div></div><span style="font-weight:700;color:#2d2820;font-size:.85rem">${fmt(t.montant)}</span>${bdg(st,t.statut)}</div>`;
-      });
-      html+=`<div style="margin-top:.75rem;background:#e8effa;border-radius:.65rem;padding:.75rem;display:flex;justify-content:space-between;align-items:center"><span style="color:#1a3a6a;font-weight:600;font-size:.85rem">Total dépenses</span><span style="color:#1a3a6a;font-weight:700">${fmt(trT)}</span></div>`;
+    if(S.tab==="travaux"){
+      h+='<div class="sh"><h3 class="st">Entretien &amp; Travaux</h3><button class="ab" onclick="om(\'at\')">+ Ajouter</button></div>';
+      if(pT.length===0)h+='<div class="empty">&#128295;<br>Aucune intervention</div>';
+      for(var i=0;i<pT.length;i++){var t=pT[i];var tc=TTY[t.type]||TTY.entretien;var ts=SCS[t.stat]||SCS.envoye;h+='<div class="row">'+chp(tc.c,tc.bg,tc.lb)+'<div style="flex:1"><div style="font-weight:600;font-size:.85rem">'+esc(t.desc)+'</div><div style="font-size:.7rem;color:#8a7968">'+esc(t.prest)+' &middot; '+fd(t.date)+'</div></div><span style="font-weight:700;font-size:.85rem">'+fmt(t.mt)+'</span>'+bdg(ts,t.stat)+'</div>';}
+      h+='<div style="margin-top:.75rem;background:#e8effa;border-radius:.65rem;padding:.75rem;display:flex;justify-content:space-between"><span style="color:#1a3a6a;font-weight:600;font-size:.85rem">Total</span><span style="color:#1a3a6a;font-weight:700">'+fmt(trT)+'</span></div>';
     }
-
-    // Tab courriers
-    if(state.tab==="courriers"){
-      html+=`<div class="sec-head"><h3 class="sec-title">Courriers & Procédures</h3><button class="add-btn" onclick="openModal('addCourrier')">+ Ajouter</button></div>`;
-      if(pC.length===0)html+=`<div class="empty">📬<br>Aucun courrier</div>`;
-      pC.forEach(c=>{
-        const sc2=SC[c.statut]||SC.envoyé;
-        html+=`<div class="row"><div style="flex:1"><div style="font-weight:600;font-size:.85rem;color:#2d2820">${esc(c.titre)}</div><div style="font-size:.7rem;color:#8a7968">${TC[c.type]||c.type} · ${fmtDate(c.date)}</div>${c.notes?`<div style="font-size:.68rem;color:#a89a88">📎 ${esc(c.notes)}</div>`:""}</div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">${bdg(sc2,c.statut)}<select onchange="updateCourrierStatut(${c.id},this.value)" style="font-size:.7rem;padding:.22rem .4rem;border-radius:.4rem;border:1px solid #ddd8cf;background:#faf9f7;color:#2d2820;cursor:pointer"><option value="planifié"${c.statut==="planifié"?" selected":""}>Planifié</option><option value="envoyé"${c.statut==="envoyé"?" selected":""}>Envoyé</option><option value="en_cours"${c.statut==="en_cours"?" selected":""}>En cours</option><option value="classé"${c.statut==="classé"?" selected":""}>Classé</option></select></div></div>`;
-      });
+    if(S.tab==="courriers"){
+      h+='<div class="sh"><h3 class="st">Courriers</h3><button class="ab" onclick="om(\'ac\')">+ Ajouter</button></div>';
+      if(pC.length===0)h+='<div class="empty">&#128140;<br>Aucun courrier</div>';
+      for(var i=0;i<pC.length;i++){var c=pC[i];var cs=SCS[c.stat]||SCS.envoye;h+='<div class="row"><div style="flex:1"><div style="font-weight:600;font-size:.85rem">'+esc(c.titre)+'</div><div style="font-size:.7rem;color:#8a7968">'+(TCR[c.type]||c.type)+' &middot; '+fd(c.date)+'</div>'+(c.notes?'<div style="font-size:.68rem;color:#a89a88">'+esc(c.notes)+'</div>':"")+'</div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">'+bdg(cs,c.stat)+'<select onchange="ucS('+c.id+',this.value)" style="font-size:.7rem;padding:.22rem .4rem;border-radius:.4rem;border:1px solid #ddd;background:#faf9f7;cursor:pointer"><option value="planifie"'+(c.stat==="planifie"?" selected":"")+'>Planifie</option><option value="envoye"'+(c.stat==="envoye"?" selected":"")+'>Envoye</option><option value="encours"'+(c.stat==="encours"?" selected":"")+'>En cours</option><option value="classe"'+(c.stat==="classe"?" selected":"")+'>Classe</option></select></div></div>';}
     }
-
-    // Tab mails
-    if(state.tab==="mails"){
-      html+=`<div class="sec-head"><h3 class="sec-title">Messagerie</h3><button class="add-btn" onclick="openModal('addMail')">✉️ Nouveau</button></div>`;
-      if(pM.length===0)html+=`<div class="empty">✉️<br>Aucun mail</div>`;
-      pM.forEach(m=>{
-        html+=`<div class="row" onclick="viewMail(${m.id})" style="cursor:pointer;background:${m.lu?"":"#f0f6ff"}">
-          <span style="width:7px;height:7px;border-radius:50%;background:${m.lu?"transparent":"#1e88e5"};flex-shrink:0"></span>
-          <div style="flex:1;min-width:0">
-            <div style="display:flex;align-items:center;gap:.4rem;flex-wrap:wrap">
-              <span style="font-weight:${m.lu?400:700};font-size:.85rem;color:#2d2820;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px">${esc(m.objet)}</span>
-              ${m.aiTriage?chp("#1a3a2a","#e8f4ed","🤖"):""}
-              ${m.tag?chp("#1a3a6a","#e8effa",m.tag):""}
-            </div>
-            <div style="font-size:.7rem;color:#8a7968">${m.de==="moi"?"→ "+esc(m.a):"← "+esc(m.de)} · ${fmtDate(m.date)}</div>
-          </div>
-          <span style="color:#a89a88;font-size:.85rem">›</span>
-        </div>`;
-      });
+    if(S.tab==="mails"){
+      h+='<div class="sh"><h3 class="st">Messagerie</h3><button class="ab" onclick="om(\'am\')">&#9993; Nouveau</button></div>';
+      if(pM.length===0)h+='<div class="empty">&#9993;<br>Aucun mail</div>';
+      for(var i=0;i<pM.length;i++){var m=pM[i];h+='<div class="row" onclick="vm('+m.id+')" style="cursor:pointer;background:'+(m.lu?"":"#f0f6ff")+'"><span style="width:7px;height:7px;border-radius:50%;background:'+(m.lu?"transparent":"#1e88e5")+';flex-shrink:0"></span><div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:.4rem"><span style="font-weight:'+(m.lu?400:700)+';font-size:.85rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px">'+esc(m.obj)+'</span>'+(m.ia?chp("#1a3a2a","#e8f4ed","IA"):"")+(m.tag?chp("#1a3a6a","#e8effa",m.tag):"")+'</div><div style="font-size:.7rem;color:#8a7968">'+(m.de==="moi"?"&rarr; "+esc(m.a):"&larr; "+esc(m.de))+" &middot; "+fd(m.date)+'</div></div><span style="color:#a89a88">&#8250;</span></div>';}
     }
-    html+=`</div>`;
-    html+=`<button onclick="confirmDelete(${prop.id})" style="width:100%;margin-top:1rem;background:#fdf2f2;color:#c0392b;padding:.7rem;border-radius:.75rem;font-size:.85rem;border:1px solid #f8c6c6;cursor:pointer">🗑️ Supprimer ce bien</button>`;
+    h+='</div>';
+    h+='<button onclick="cdel('+prop.id+')" style="width:100%;margin-top:1rem;background:#fdf2f2;color:#c0392b;padding:.7rem;border-radius:.75rem;font-size:.85rem;border:1px solid #f8c6c6;cursor:pointer">&#128465; Supprimer ce bien</button>';
   }
 
   // ══ LOYERS GLOBAL ══
-  else if(state.nav==="loyers_g"){
-    html+=`<h1 style="font-size:1.2rem;font-weight:700;color:#1a3a2a;margin-bottom:1rem">💶 Loyers & Impayés</h1>`;
-    d.properties.forEach(p=>{
-      const pl=d.loyers.filter(l=>l.propId===p.id).sort((a,b)=>b.mois.localeCompare(a.mois));
-      if(pl.length===0)return;
-      html+=`<div class="card" style="margin-bottom:1rem"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem;cursor:pointer" onclick="goDetail(${p.id},'loyers')"><div style="display:flex;align-items:center;gap:.6rem"><span style="font-size:1.4rem">${p.image}</span><div><div style="font-weight:700;font-size:.9rem;color:#2d2820">${esc(p.nom)}</div><div style="font-size:.72rem;color:#8a7968">${p.locataire?.nom||"Vacant"}</div></div></div><span style="font-size:.78rem;color:#1a3a2a">Détail ›</span></div>`;
-      pl.slice(0,5).forEach(l=>{
-        const sl=SL[l.statut]||SL.attendu;
-        html+=`<div class="row"><span style="flex:1;font-size:.85rem;color:#2d2820">${moisLabel(l.mois)}</span><span style="font-weight:600;font-size:.85rem">${fmt(l.montant)}</span>${bdg(sl,sl.label)}${l.statut!=="payé"?`<select onchange="updateLoyerStatut(${l.id},this.value)" style="font-size:.72rem;padding:.22rem .4rem;border-radius:.4rem;border:1px solid #ddd8cf;background:#faf9f7;color:#2d2820;cursor:pointer;max-width:90px"><option value="attendu"${l.statut==="attendu"?" selected":""}>Attendu</option><option value="retard"${l.statut==="retard"?" selected":""}>Retard</option><option value="impayé"${l.statut==="impayé"?" selected":""}>Impayé</option><option value="payé">✓ Payé</option></select>`:""}
-        </div>`;
-      });
-      html+=`</div>`;
-    });
+  else if(S.nav==="loyers"){
+    h+='<h1 style="font-size:1.2rem;font-weight:700;color:#1a3a2a;margin-bottom:1rem">&#128182; Loyers &amp; Impayes</h1>';
+    for(var i=0;i<d.props.length;i++){
+      var p=d.props[i];
+      var pl=[];for(var j=0;j<d.loyers.length;j++){if(d.loyers[j].pid===p.id)pl.push(d.loyers[j]);}
+      pl.sort(function(a,b){return b.mois.localeCompare(a.mois);});
+      h+='<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem"><div style="display:flex;align-items:center;gap:.6rem"><span style="font-size:1.4rem">'+getImg(p)+'</span><div><div style="font-weight:700;font-size:.9rem">'+esc(p.nom)+'</div><div style="font-size:.72rem;color:#8a7968">'+(p.loc?p.loc.nom:"Vacant")+' &middot; '+fmt(p.loyer)+'/mois</div></div></div><button onclick="S.pid='+p.id+';om(\'al\')" style="background:#1a3a2a;color:#fff;padding:.35rem .7rem;border-radius:.55rem;font-size:.75rem;cursor:pointer">+ Loyer</button></div>';
+      if(pl.length===0){h+='<div class="empty" style="padding:.75rem">Aucun loyer - cliquez + Loyer pour commencer</div>';}
+      for(var j=0;j<pl.length;j++){
+        var l=pl[j];var sl=SLS[l.stat]||SLS.attendu;
+        h+='<div class="row"><div style="flex:1"><div style="font-weight:600;font-size:.85rem">'+ml(l.mois)+'</div>'+(l.dp?'<div style="font-size:.7rem;color:#8a7968">Verse le '+fd(l.dp)+'</div>':"")+'</div><span style="font-weight:700;font-size:.85rem">'+fmt(l.mt)+'</span>'+bdg(sl,sl.lb)+(l.stat!=="paye"?'<select onchange="ulS('+l.id+',this.value)" style="font-size:.72rem;padding:.22rem .4rem;border-radius:.4rem;border:1px solid #ddd;background:#faf9f7;cursor:pointer;max-width:85px"><option value="attendu"'+(l.stat==="attendu"?" selected":"")+'>Attendu</option><option value="retard"'+(l.stat==="retard"?" selected":"")+'>Retard</option><option value="impaye"'+(l.stat==="impaye"?" selected":"")+'>Impaye</option><option value="paye">&#10003; Paye</option></select>':"")+'</div>';
+      }
+      h+='</div>';
+    }
   }
 
-  // ══ TRAVAUX GLOBAL ══
-  else if(state.nav==="travaux_g"){
-    html+=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem"><h1 style="font-size:1.2rem;font-weight:700;color:#1a3a2a">🔧 Travaux</h1><span style="font-weight:700;color:#2d2820;font-size:.9rem">${fmt(trCost)}</span></div>`;
-    d.properties.forEach(p=>{
-      const pt=d.travaux.filter(t=>t.propId===p.id).sort((a,b)=>b.date.localeCompare(a.date));
-      html+=`<div class="card" style="margin-bottom:1rem"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem"><div style="display:flex;align-items:center;gap:.6rem"><span style="font-size:1.4rem">${p.image}</span><div style="font-weight:700;font-size:.9rem;color:#2d2820">${esc(p.nom)}</div></div><button onclick="openAddTravaux(${p.id})" style="background:#1a3a2a;color:#fff;padding:.35rem .75rem;border-radius:.55rem;font-size:.75rem;cursor:pointer">+ Ajouter</button></div>`;
-      if(pt.length===0)html+=`<div class="empty">🔧<br>Aucune intervention</div>`;
-      pt.forEach(t=>{
-        const tc=TT[t.type]||TT.entretien;
-        const st=SC[t.statut]||SC.envoyé;
-        html+=`<div class="row">${chp(tc.color,tc.bg,tc.label)}<div style="flex:1"><div style="font-weight:600;font-size:.85rem;color:#2d2820">${esc(t.desc)}</div><div style="font-size:.7rem;color:#8a7968">${esc(t.prestataire)} · ${fmtDate(t.date)}</div></div><span style="font-weight:700;font-size:.85rem;color:#2d2820">${fmt(t.montant)}</span>${bdg(st,t.statut)}</div>`;
-      });
-      html+=`</div>`;
-    });
+  // ══ CHARGES GLOBAL ══
+  else if(S.nav==="charges"){
+    h+='<h1 style="font-size:1.2rem;font-weight:700;color:#1a3a2a;margin-bottom:1rem">&#128200; Charges Mensuelles</h1>';
+    var anneeActuelle=new Date().getFullYear();
+    for(var i=0;i<d.props.length;i++){
+      var p=d.props[i];
+      var ch=null;
+      for(var j=0;j<d.charges.length;j++){if(d.charges[j].pid===p.id&&d.charges[j].annee===anneeActuelle){ch=d.charges[j];break;}}
+      var totCh=0;
+      if(ch){totCh=(ch.eau||0)+(ch.electricite||0)+(ch.assurance||0)+(ch.syndic||0)+(ch.copro||0)+(ch.taxe||0);}
+      h+='<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.85rem"><div style="display:flex;align-items:center;gap:.6rem"><span style="font-size:1.4rem">'+getImg(p)+'</span><div><div style="font-weight:700;font-size:.9rem">'+esc(p.nom)+'</div><div style="font-size:.72rem;color:#8a7968">'+p.type+'</div></div></div><button onclick="opCharges('+p.id+')" style="background:#1a3a2a;color:#fff;padding:.35rem .7rem;border-radius:.55rem;font-size:.75rem;cursor:pointer">&#9998; Modifier</button></div>';
+      if(ch){
+        var items=[["Eau",ch.eau||0,"&#128167;"],["Electricite",ch.electricite||0,"&#9889;"],["Assurance",ch.assurance||0,"&#128274;"],["Syndic",ch.syndic||0,"&#127962;"],["Copropriete",ch.copro||0,"&#128176;"],["Taxe fonciere",ch.taxe||0,"&#128196;"]];
+        h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.75rem">';
+        for(var j=0;j<items.length;j++){var it=items[j];if(it[1]>0){h+='<div style="background:#f5f2ed;border-radius:.55rem;padding:.55rem .7rem;display:flex;justify-content:space-between;align-items:center"><span style="font-size:.75rem;color:#5a4e42">'+it[2]+' '+it[0]+'</span><span style="font-weight:700;font-size:.82rem;color:#1a3a2a">'+fmt(it[1])+'</span></div>';}}
+        h+='</div>';
+        h+='<div style="background:#e8f4ed;border-radius:.65rem;padding:.75rem;display:flex;justify-content:space-between"><span style="color:#1a3a2a;font-weight:600;font-size:.85rem">Total annuel</span><span style="color:#1a3a2a;font-weight:700">'+fmt(totCh)+'</span></div>';
+        h+='<div style="margin-top:.5rem;color:#8a7968;font-size:.75rem;text-align:center">Soit '+fmt(Math.round(totCh/12))+'/mois</div>';
+      }else{h+='<div class="empty" style="padding:.75rem">Aucune charge enregistree</div>';}
+      h+='</div>';
+    }
+  }
+
+  // ══ SAISONNIER ══
+  else if(S.nav==="sais"){
+    var sp=d.saisonnier.props;
+    h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem"><h1 style="font-size:1.2rem;font-weight:700;color:#1a3a2a">&#9728; Location Saisonniere</h1><button onclick="om(\'asp\')" style="background:#1a3a2a;color:#fff;padding:.4rem .9rem;border-radius:.65rem;font-size:.78rem;cursor:pointer">+ Bien</button></div>';
+    var anneeActuelle=new Date().getFullYear();
+    var totRevSais=0;
+    for(var i=0;i<sp.length;i++)totRevSais+=revsAnnee(sp[i].id,anneeActuelle);
+    h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1rem">';
+    h+='<div class="kpi" style="border-left:3px solid #1a3a2a"><div style="font-size:.62rem;color:#8a7968;text-transform:uppercase">Biens saisonniers</div><div style="font-size:1.2rem;font-weight:700;color:#2d2820;margin:.2rem 0 .1rem">'+sp.length+'</div></div>';
+    h+='<div class="kpi" style="border-left:3px solid #1a3a2a"><div style="font-size:.62rem;color:#8a7968;text-transform:uppercase">Revenus '+anneeActuelle+'</div><div style="font-size:1.1rem;font-weight:700;color:#1a3a2a;margin:.2rem 0 .1rem">'+fmt(totRevSais)+'</div></div>';
+    h+='</div>';
+    if(sp.length===0){h+='<div class="card"><div class="empty">&#9728;<br>Aucun bien saisonnier<br><small>Cliquez + Bien pour commencer</small></div></div>';}
+    for(var i=0;i<sp.length;i++){
+      var p=sp[i];
+      var rev=revsAnnee(p.id,anneeActuelle);
+      var ch=chargesAnnee(p.id,anneeActuelle);
+      var totCh=totalChargesSais(ch);
+      var nbRes=0;for(var j=0;j<d.saisonnier.reservations.length;j++){if(d.saisonnier.reservations[j].pid===p.id&&d.saisonnier.reservations[j].debut.startsWith(String(anneeActuelle)))nbRes++;}
+      h+='<div class="card" style="cursor:pointer" onclick="gsd('+p.id+')"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.75rem"><div><div style="font-weight:700;font-size:.95rem;color:#1a3a2a">'+esc(p.nom)+'</div><div style="font-size:.75rem;color:#8a7968">'+esc(p.adr)+'</div><div style="font-size:.72rem;color:#8a7968;margin-top:.2rem">'+p.surf+'m2 &middot; '+fmt(p.prix_nuit)+'/nuit</div></div><div style="text-align:right"><div style="font-size:.65rem;color:#8a7968;text-transform:uppercase">Revenus '+anneeActuelle+'</div><div style="font-size:1.1rem;font-weight:700;color:#1a3a2a">'+fmt(rev)+'</div></div></div>';
+      h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem">';
+      h+='<div style="background:#e8f4ed;border-radius:.6rem;padding:.55rem;text-align:center"><div style="font-size:.6rem;color:#8a7968;text-transform:uppercase">Reservations</div><div style="font-weight:700;color:#1a3a2a">'+nbRes+'</div></div>';
+      h+='<div style="background:#fdf2f2;border-radius:.6rem;padding:.55rem;text-align:center"><div style="font-size:.6rem;color:#8a7968;text-transform:uppercase">Charges</div><div style="font-weight:700;color:#c0392b">'+fmt(totCh)+'</div></div>';
+      h+='<div style="background:#e8effa;border-radius:.6rem;padding:.55rem;text-align:center"><div style="font-size:.6rem;color:#8a7968;text-transform:uppercase">Net</div><div style="font-weight:700;color:#1a3a6a">'+fmt(rev-totCh)+'</div></div>';
+      h+='</div><div style="margin-top:.75rem;font-size:.75rem;color:#8a7968;text-align:center">Appuyer pour voir calendrier &rarr;</div></div>';
+    }
+  }
+
+  // ══ DETAIL SAISONNIER ══
+  else if(S.nav==="sdet"){
+    var sp=null;
+    for(var i=0;i<d.saisonnier.props.length;i++){if(d.saisonnier.props[i].id===S.spid){sp=d.saisonnier.props[i];break;}}
+    if(!sp){h='<div class="empty">Bien introuvable</div>';}
+    else{
+      var annee=S.scal.annee;
+      var moisIdx=S.scal.mois;
+      var resProps=[];
+      for(var i=0;i<d.saisonnier.reservations.length;i++){if(d.saisonnier.reservations[i].pid===sp.id)resProps.push(d.saisonnier.reservations[i]);}
+      var ch=chargesAnnee(sp.id,annee);
+      var totCh=totalChargesSais(ch);
+      var rev=revsAnnee(sp.id,annee);
+
+      h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem"><div><h1 style="font-size:1.1rem;font-weight:700;color:#1a3a2a">'+esc(sp.nom)+'</h1><p style="color:#8a7968;font-size:.75rem">'+sp.surf+'m2 &middot; '+fmt(sp.prix_nuit)+'/nuit</p></div><button onclick="om(\'esp\','+sp.id+')" style="background:#1a3a2a;color:#fff;padding:.4rem .85rem;border-radius:.65rem;font-size:.78rem;cursor:pointer">&#9998;</button></div>';
+
+      // Bilan annuel
+      h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin-bottom:1rem">';
+      h+='<div style="background:#e8f4ed;border-radius:.75rem;padding:.7rem;text-align:center"><div style="font-size:.6rem;color:#8a7968;text-transform:uppercase">Revenus</div><div style="font-weight:700;color:#1a3a2a;font-size:.95rem">'+fmt(rev)+'</div></div>';
+      h+='<div style="background:#fdf2f2;border-radius:.75rem;padding:.7rem;text-align:center"><div style="font-size:.6rem;color:#8a7968;text-transform:uppercase">Charges</div><div style="font-weight:700;color:#c0392b;font-size:.95rem">'+fmt(totCh)+'</div></div>';
+      h+='<div style="background:#e8effa;border-radius:.75rem;padding:.7rem;text-align:center"><div style="font-size:.6rem;color:#8a7968;text-transform:uppercase">Net '+annee+'</div><div style="font-weight:700;color:#1a3a6a;font-size:.95rem">'+fmt(rev-totCh)+'</div></div>';
+      h+='</div>';
+
+      // Onglets
+      h+='<div class="card"><div style="display:flex;gap:.3rem;margin-bottom:1rem;overflow-x:auto;padding-bottom:.25rem">';
+      var stabs=[["scalendrier","&#128197; Calendrier"],["sreservations","&#128203; Reservations"],["scharges","&#128200; Charges"],["sinteg","&#128279; Integrations"]];
+      for(var i=0;i<stabs.length;i++){h+='<button class="tab '+(S.tab===stabs[i][0]?"on":"")+'" onclick="st(\''+stabs[i][0]+'\')">'+stabs[i][1]+'</button>';}
+      h+='</div>';
+
+      if(S.tab==="scalendrier"){
+        // Navigation mois
+        h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem">';
+        h+='<button onclick="calNav(-1)" style="background:#f5f2ed;border:none;padding:.4rem .8rem;border-radius:.6rem;cursor:pointer;font-size:.9rem">&lt;</button>';
+        h+='<div style="font-weight:700;color:#1a3a2a;font-size:.9rem">'+MOISLONG[moisIdx]+' '+annee+'</div>';
+        h+='<button onclick="calNav(1)" style="background:#f5f2ed;border:none;padding:.4rem .8rem;border-radius:.6rem;cursor:pointer;font-size:.9rem">&gt;</button>';
+        h+='</div>';
+
+        // Calendrier
+        var premierJour=new Date(annee,moisIdx,1).getDay();
+        var nbJours=new Date(annee,moisIdx+1,0).getDate();
+        var joursS=["Di","Lu","Ma","Me","Je","Ve","Sa"];
+        h+='<table class="cal"><thead><tr>';
+        for(var i=0;i<7;i++)h+='<th>'+joursS[i]+'</th>';
+        h+='</tr></thead><tbody>';
+        var jour=1;var semaine=0;
+        h+='<tr>';
+        for(var i=0;i<premierJour;i++)h+='<td></td>';
+        var col=premierJour;
+        while(jour<=nbJours){
+          if(col===7){h+='</tr><tr>';col=0;}
+          var dateStr=annee+'-'+(moisIdx+1<10?'0'+(moisIdx+1):(moisIdx+1))+'-'+(jour<10?'0'+jour:jour);
+          var ress=[];
+          for(var i=0;i<resProps.length;i++){var r=resProps[i];if(r.debut<=dateStr&&r.fin>dateStr)ress.push(r);}
+          h+='<td onclick="opNR(\''+dateStr+'\')" style="padding:.2rem">';
+          h+='<div style="font-size:.7rem;color:#5a4e42;font-weight:'+(new Date(dateStr).toDateString()===new Date().toDateString()?"700":"400")+'">'+(new Date(dateStr).toDateString()===new Date().toDateString()?'<span style="background:#1a3a2a;color:#fff;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:.65rem">'+jour+'</span>':jour)+'</div>';
+          for(var i=0;i<ress.length;i++){var r=ress[i];h+='<div class="res" style="background:'+r.couleur+';color:#fff">'+esc(r.nom.split(" ")[0])+'</div>';}
+          h+='</td>';
+          jour++;col++;
+        }
+        while(col<7){h+='<td></td>';col++;}
+        h+='</tr></tbody></table>';
+
+        // Legende couleurs
+        var ressMois=[];
+        for(var i=0;i<resProps.length;i++){
+          var r=resProps[i];
+          var dm=r.debut.substring(0,7);
+          var fm=r.fin.substring(0,7);
+          var mStr=(annee)+'-'+(moisIdx+1<10?'0'+(moisIdx+1):(moisIdx+1));
+          if(dm===mStr||fm===mStr||(dm<mStr&&fm>mStr))ressMois.push(r);
+        }
+        if(ressMois.length>0){
+          h+='<div style="margin-top:.75rem"><div style="font-size:.72rem;color:#8a7968;text-transform:uppercase;margin-bottom:.4rem">Ce mois</div>';
+          for(var i=0;i<ressMois.length;i++){
+            var r=ressMois[i];
+            var nb=daysBetween(r.debut,r.fin);
+            h+='<div class="row"><span style="width:10px;height:10px;border-radius:2px;background:'+r.couleur+';flex-shrink:0"></span><div style="flex:1"><div style="font-weight:600;font-size:.83rem">'+esc(r.nom)+'</div><div style="font-size:.7rem;color:#8a7968">'+fd(r.debut)+' &rarr; '+fd(r.fin)+' ('+nb+'n) &middot; '+chp(r.source==="airbnb"?"#FF5A5F":"#003580",r.source==="airbnb"?"#FFE0E2":r.source==="booking"?"#cce5ff":"#f0f7f4",r.source==="airbnb"?"Airbnb":r.source==="booking"?"Booking":"Manuel")+'</div></div><div style="text-align:right;font-weight:700;color:#1a3a2a;font-size:.85rem">'+fmt(r.prix)+'</div></div>';
+          }
+          h+='</div>';
+        }
+      }
+
+      if(S.tab==="sreservations"){
+        h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.85rem"><h3 class="st">Reservations '+annee+'</h3><button class="ab" onclick="opNR(null)">+ Reserver</button></div>';
+        var resAnnee=[];
+        for(var i=0;i<resProps.length;i++){if(resProps[i].debut.startsWith(String(annee)))resAnnee.push(resProps[i]);}
+        resAnnee.sort(function(a,b){return a.debut.localeCompare(b.debut);});
+        if(resAnnee.length===0)h+='<div class="empty">Aucune reservation pour '+annee+'</div>';
+        var totRev=0;
+        for(var i=0;i<resAnnee.length;i++){
+          var r=resAnnee[i];totRev+=r.prix||0;
+          var nb=daysBetween(r.debut,r.fin);
+          var src=r.source==="airbnb"?"Airbnb":r.source==="booking"?"Booking":"Manuel";
+          h+='<div class="row"><span style="width:10px;height:10px;border-radius:2px;background:'+r.couleur+';flex-shrink:0"></span><div style="flex:1"><div style="font-weight:600;font-size:.85rem">'+esc(r.nom)+'</div><div style="font-size:.7rem;color:#8a7968">'+fd(r.debut)+' &rarr; '+fd(r.fin)+' &middot; '+nb+' nuits &middot; '+src+'</div></div><div style="text-align:right"><div style="font-weight:700;color:#1a3a2a">'+fmt(r.prix)+'</div><button onclick="delRes('+r.id+')" style="background:none;border:none;color:#c0392b;font-size:.7rem;cursor:pointer;padding:.1rem .2rem">&#128465;</button></div></div>';
+        }
+        if(resAnnee.length>0)h+='<div style="margin-top:.75rem;background:#e8f4ed;border-radius:.65rem;padding:.75rem;display:flex;justify-content:space-between"><span style="color:#1a3a2a;font-weight:600;font-size:.85rem">Total revenus</span><span style="color:#1a3a2a;font-weight:700">'+fmt(totRev)+'</span></div>';
+      }
+
+      if(S.tab==="scharges"){
+        h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.85rem"><h3 class="st">Charges '+annee+'</h3><button class="ab" onclick="opSC('+sp.id+','+annee+')">&#9998; Modifier</button></div>';
+        if(!ch){h+='<div class="empty">Aucune charge enregistree pour '+annee+'</div>';}
+        else{
+          var items=[["Eau",ch.eau||0,"&#128167;"],["Electricite",ch.electricite||0,"&#9889;"],["Menage",ch.menage||0,"&#129529;"],["Copropriete",ch.copro||0,"&#127962;"]];
+          for(var i=0;i<items.length;i++){var it=items[i];h+='<div class="row"><span style="font-size:1rem;flex-shrink:0">'+it[2]+'</span><span style="flex:1;font-size:.85rem;font-weight:600">'+it[0]+'</span><span style="font-weight:700;color:#1a3a2a">'+fmt(it[1])+'</span></div>';}
+          if(ch.divers&&ch.divers.length>0){
+            h+='<div style="padding:.5rem .85rem;font-size:.75rem;font-weight:700;color:#8a7968;text-transform:uppercase">Divers</div>';
+            for(var i=0;i<ch.divers.length;i++){var dv=ch.divers[i];h+='<div class="row"><span style="font-size:1rem;flex-shrink:0">&#128176;</span><span style="flex:1;font-size:.85rem;font-weight:600">'+esc(dv.desc)+'</span><span style="font-weight:700;color:#1a3a2a">'+fmt(dv.mt)+'</span></div>';}
+          }
+          h+='<div style="margin-top:.75rem;background:#fdf2f2;border-radius:.65rem;padding:.75rem;display:flex;justify-content:space-between"><span style="color:#c0392b;font-weight:600;font-size:.85rem">Total charges</span><span style="color:#c0392b;font-weight:700">'+fmt(totCh)+'</span></div>';
+          h+='<div style="margin-top:.5rem;text-align:center;font-size:.75rem;color:#8a7968">Net annuel : <strong style="color:#1a3a2a">'+fmt(rev-totCh)+'</strong></div>';
+        }
+      }
+
+      if(S.tab==="sinteg"){
+        h+='<h3 class="st" style="margin-bottom:.85rem">Integrations</h3>';
+        h+='<div class="row"><div style="flex:1"><div style="font-weight:600;font-size:.88rem">&#128279; Airbnb</div><div style="font-size:.75rem;color:#8a7968">Synchronisation calendrier iCal</div></div><button onclick="alert(\'Entrez votre URL iCal Airbnb dans les parametres Airbnb > Disponibilites > Exporter calendrier\')" style="background:#FF5A5F;color:#fff;padding:.4rem .85rem;border-radius:.6rem;font-size:.78rem;cursor:pointer">Connecter</button></div>';
+        h+='<div class="row"><div style="flex:1"><div style="font-weight:600;font-size:.88rem">&#128279; Booking.com</div><div style="font-size:.75rem;color:#8a7968">Synchronisation calendrier iCal</div></div><button onclick="alert(\'Entrez votre URL iCal Booking dans l extranet Booking > Disponibilites > Sync calendrier\')" style="background:#003580;color:#fff;padding:.4rem .85rem;border-radius:.6rem;font-size:.78rem;cursor:pointer">Connecter</button></div>';
+        h+='<div style="margin-top:1rem;background:#fffdf0;border:1px solid rgba(184,147,10,.3);border-radius:.75rem;padding:.85rem;font-size:.8rem;color:#b8930a">Note: La synchronisation automatique necessite un serveur. Pour l instant, importez manuellement vos reservations via + Reserver.</div>';
+      }
+      h+='</div>';
+    }
   }
 
   // ══ MORE ══
-  else if(state.nav==="more"){
-    html+=`<h1 style="font-size:1.2rem;font-weight:700;color:#1a3a2a;margin-bottom:1rem">Plus</h1>`;
-    html+=`<div class="card" style="margin-bottom:1rem"><div class="sec-head"><h3 class="sec-title">📬 Courriers & Procédures</h3></div>`;
-    d.properties.forEach(p=>{
-      const pc=d.courriers.filter(c=>c.propId===p.id).sort((a,b)=>b.date.localeCompare(a.date));
-      html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid #f5f2ed"><div style="display:flex;align-items:center;gap:.5rem"><span>${p.image}</span><span style="font-weight:600;font-size:.85rem;color:#2d2820">${esc(p.nom)}</span></div><button onclick="openAddCourrier(${p.id})" style="background:#1a3a2a;color:#fff;padding:.3rem .65rem;border-radius:.5rem;font-size:.72rem;cursor:pointer">+ Courrier</button></div>`;
-      if(pc.length===0)html+=`<div style="font-size:.78rem;color:#a89a88;padding:.5rem 0">Aucun courrier</div>`;
-      pc.slice(0,3).forEach(c=>{const sc2=SC[c.statut]||SC.envoyé;html+=`<div class="row"><div style="flex:1"><div style="font-weight:600;font-size:.82rem;color:#2d2820">${esc(c.titre)}</div><div style="font-size:.68rem;color:#8a7968">${TC[c.type]||c.type} · ${fmtDate(c.date)}</div></div>${bdg(sc2,c.statut)}</div>`;});
-    });
-    html+=`</div>`;
-
-    html+=`<div class="card" style="margin-bottom:1rem">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
-        <h3 class="sec-title">✉️ Messagerie ${unread>0?`<span style="background:#1e88e5;color:#fff;font-size:.62rem;padding:1px 6px;border-radius:10px;margin-left:4px">${unread}</span>`:""}</h3>
-        <button onclick="openModal('aiTriage')" style="background:linear-gradient(135deg,#1a5c30,#0d3a1e);color:#a8e6b8;padding:.35rem .75rem;border-radius:.55rem;font-size:.72rem;border:1px solid #2d5c42;cursor:pointer">🤖 Triage IA</button>
-      </div>`;
-    d.properties.forEach(p=>{
-      const pm=d.mails.filter(m=>m.propId===p.id).sort((a,b)=>b.date.localeCompare(a.date));
-      const unr=pm.filter(m=>!m.lu).length;
-      html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid #f5f2ed"><div style="display:flex;align-items:center;gap:.5rem"><span>${p.image}</span><span style="font-weight:600;font-size:.85rem;color:#2d2820">${esc(p.nom)}</span>${unr>0?`<span style="background:#1e88e5;color:#fff;font-size:.62rem;padding:1px 6px;border-radius:10px">${unr}</span>`:""}</div><button onclick="openAddMail(${p.id})" style="background:#1a3a2a;color:#fff;padding:.3rem .65rem;border-radius:.5rem;font-size:.72rem;cursor:pointer">✉️ Nouveau</button></div>`;
-      pm.slice(0,4).forEach(m=>{
-        html+=`<div class="row" onclick="viewMail(${m.id})" style="cursor:pointer;background:${m.lu?"":"#f0f6ff"}">
-          <span style="width:6px;height:6px;border-radius:50%;background:${m.lu?"transparent":"#1e88e5"};flex-shrink:0"></span>
-          <div style="flex:1;min-width:0">
-            <div style="display:flex;align-items:center;gap:.4rem">
-              <span style="font-weight:${m.lu?400:700};font-size:.82rem;color:#2d2820;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px">${esc(m.objet)}</span>
-              ${m.aiTriage?chp("#1a3a2a","#e8f4ed","🤖"):""}
-              ${m.tag?chp("#1a3a6a","#e8effa",m.tag):""}
-            </div>
-            <div style="font-size:.68rem;color:#8a7968">${m.de==="moi"?"→ "+esc(m.a):"← "+esc(m.de)}</div>
-          </div>
-          <span style="color:#a89a88">›</span>
-        </div>`;
-      });
-    });
-    html+=`</div>`;
-    html+=`<div class="card" style="padding:.85rem;text-align:center"><div style="font-size:1.5rem;margin-bottom:.35rem">🗝️</div><div style="font-weight:700;color:#1a3a2a;font-size:.9rem">Solidor Immo</div><div style="font-size:.72rem;color:#8a7968;margin-top:.2rem">Version 2.0 — Données sauvegardées localement</div><button onclick="resetData()" style="margin-top:.75rem;background:#fdf2f2;color:#c0392b;padding:.4rem .85rem;border-radius:.6rem;font-size:.72rem;border:1px solid #f8c6c6;cursor:pointer">🔄 Réinitialiser les données</button></div>`;
+  else if(S.nav==="more"){
+    h+='<h1 style="font-size:1.2rem;font-weight:700;color:#1a3a2a;margin-bottom:1rem">Plus</h1>';
+    h+='<div class="card"><div class="sh"><h3 class="st">&#128140; Courriers</h3></div>';
+    for(var i=0;i<d.props.length;i++){
+      var p=d.props[i];var pc=[];for(var j=0;j<d.courriers.length;j++){if(d.courriers[j].pid===p.id)pc.push(d.courriers[j]);}
+      h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid #f5f2ed"><div style="display:flex;align-items:center;gap:.5rem">'+getImg(p)+'<span style="font-weight:600;font-size:.85rem">'+esc(p.nom)+'</span></div><button onclick="S.pid='+p.id+';om(\'ac\')" style="background:#1a3a2a;color:#fff;padding:.3rem .65rem;border-radius:.5rem;font-size:.72rem;cursor:pointer">+ Courrier</button></div>';
+      if(pc.length===0)h+='<div style="font-size:.78rem;color:#a89a88;padding:.5rem 0">Aucun courrier</div>';
+      for(var j=0;j<Math.min(pc.length,3);j++){var c=pc[j];var cs=SCS[c.stat]||SCS.envoye;h+='<div class="row"><div style="flex:1"><div style="font-weight:600;font-size:.82rem">'+esc(c.titre)+'</div><div style="font-size:.68rem;color:#8a7968">'+(TCR[c.type]||c.type)+' &middot; '+fd(c.date)+'</div></div>'+bdg(cs,c.stat)+'</div>';}
+    }
+    h+='</div>';
+    h+='<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem"><h3 class="st">&#9993; Messagerie '+(unr>0?'<span style="background:#1e88e5;color:#fff;font-size:.62rem;padding:1px 6px;border-radius:10px;margin-left:4px">'+unr+'</span>':"")+'</h3><button onclick="om(\'ait\')" style="background:linear-gradient(135deg,#1a5c30,#0d3a1e);color:#a8e6b8;padding:.35rem .75rem;border-radius:.55rem;font-size:.72rem;border:1px solid #2d5c42;cursor:pointer">&#129302; IA</button></div>';
+    for(var i=0;i<d.props.length;i++){
+      var p=d.props[i];var pm=[];for(var j=0;j<d.mails.length;j++){if(d.mails[j].pid===p.id)pm.push(d.mails[j]);}
+      pm.sort(function(a,b){return b.date.localeCompare(a.date);});
+      var pu=0;for(var j=0;j<pm.length;j++){if(!pm[j].lu)pu++;}
+      h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid #f5f2ed"><div style="display:flex;align-items:center;gap:.5rem">'+getImg(p)+'<span style="font-weight:600;font-size:.85rem">'+esc(p.nom)+'</span>'+(pu>0?'<span style="background:#1e88e5;color:#fff;font-size:.62rem;padding:1px 6px;border-radius:10px">'+pu+'</span>':"")+'</div><button onclick="S.pid='+p.id+';om(\'am\')" style="background:#1a3a2a;color:#fff;padding:.3rem .65rem;border-radius:.5rem;font-size:.72rem;cursor:pointer">Nouveau</button></div>';
+      for(var j=0;j<Math.min(pm.length,3);j++){var m=pm[j];h+='<div class="row" onclick="vm('+m.id+')" style="cursor:pointer;background:'+(m.lu?"":"#f0f6ff")+'"><span style="width:6px;height:6px;border-radius:50%;background:'+(m.lu?"transparent":"#1e88e5")+';flex-shrink:0"></span><div style="flex:1;min-width:0"><div style="font-weight:'+(m.lu?400:700)+';font-size:.82rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(m.obj)+'</div></div><span style="color:#a89a88">&#8250;</span></div>';}
+    }
+    h+='</div>';
+    h+='<div class="card" style="text-align:center;padding:.85rem"><div style="font-size:1.5rem;margin-bottom:.35rem">&#128273;</div><div style="font-weight:700;color:#1a3a2a">Solidor Immo v3</div><div style="font-size:.72rem;color:#8a7968;margin-top:.2rem">Gestion immobiliere complete</div><button onclick="rst()" style="margin-top:.75rem;background:#fdf2f2;color:#c0392b;padding:.4rem .85rem;border-radius:.6rem;font-size:.72rem;border:1px solid #f8c6c6;cursor:pointer">Reinitialiser donnees</button></div>';
   }
 
-  main.innerHTML=html;
-  renderModal();
+  main.innerHTML=h;
+  renderM();
 }
 
-// ── MODAL ──
-function renderModal(){
-  const ex=document.getElementById("modalOverlay");
-  if(ex)ex.remove();
-  if(!state.modal)return;
-  const m=state.modal;
-  let html="";
+function renderM(){
+  var ex=document.getElementById("mo");if(ex)ex.remove();
+  if(!S.modal)return;
+  var m=S.modal;var h="";
 
-  if(m.type==="viewMail"){
-    const mail=m.payload;
-    html=`<div class="drag"></div><h2 style="font-size:1rem;font-weight:700;color:#1a3a2a;margin-bottom:1.1rem">${esc(mail.objet)}</h2>
-    <div style="background:#faf9f7;border-radius:.65rem;padding:1rem;margin-bottom:.85rem;font-size:.82rem;color:#8a7968">
-      <div style="margin-bottom:.3rem"><b style="color:#5a4e42">De :</b> ${mail.de==="moi"?"Moi":esc(mail.de)}</div>
-      <div style="margin-bottom:.3rem"><b style="color:#5a4e42">À :</b> ${esc(mail.a)}</div>
-      <div style="margin-bottom:.3rem"><b style="color:#5a4e42">Date :</b> ${fmtDate(mail.date)}</div>
-      <div style="display:flex;gap:.4rem;margin-top:.4rem;flex-wrap:wrap">${mail.tag?chp("#1a3a6a","#e8effa",mail.tag):""}${mail.aiTriage?chp("#1a3a2a","#e8f4ed","🤖 Importé par IA"):""}</div>
-    </div>
-    <div style="font-size:.85rem;color:#2d2820;line-height:1.75;white-space:pre-wrap;background:#fff;border-radius:.65rem;padding:.85rem;border:1px solid #ddd8cf">${esc(mail.corps)}</div>
-    <div style="margin-top:1rem"><button class="btn-secondary" onclick="closeModal()">Fermer</button></div>`;
+  if(m.t==="vm"){
+    var ml=m.d;
+    h='<div class="drag"></div><h2 style="font-size:1rem;font-weight:700;color:#1a3a2a;margin-bottom:1rem">'+esc(ml.obj)+'</h2>';
+    h+='<div style="background:#faf9f7;border-radius:.65rem;padding:1rem;margin-bottom:.85rem;font-size:.82rem;color:#8a7968">';
+    h+='<div><b style="color:#5a4e42">De:</b> '+(ml.de==="moi"?"Moi":esc(ml.de))+'</div><div><b style="color:#5a4e42">A:</b> '+esc(ml.a)+'</div><div><b style="color:#5a4e42">Date:</b> '+fd(ml.date)+'</div>';
+    h+='<div style="display:flex;gap:.4rem;margin-top:.4rem">'+(ml.tag?chp("#1a3a6a","#e8effa",ml.tag):"")+(ml.ia?chp("#1a3a2a","#e8f4ed","IA"):"")+'</div></div>';
+    h+='<div style="font-size:.85rem;line-height:1.75;white-space:pre-wrap;background:#fff;border-radius:.65rem;padding:.85rem;border:1px solid #ddd">'+esc(ml.corps)+'</div>';
+    h+='<div style="margin-top:1rem"><button class="bs" onclick="cm()">Fermer</button></div>';
+  }
+  else if(m.t==="cd"){
+    h='<div class="drag"></div><h2 style="font-size:1rem;font-weight:700;color:#1a3a2a;margin-bottom:1rem">Supprimer ce bien ?</h2>';
+    h+='<p style="color:#5a4e42;font-size:.88rem;margin-bottom:1.25rem">Action irreversible. <strong>'+esc(m.d.nom)+'</strong> sera supprime.</p>';
+    h+='<div style="display:flex;gap:.65rem"><button class="bs" onclick="cm()">Annuler</button><button style="flex:1;background:#c0392b;color:#fff;padding:.7rem;border-radius:.75rem;font-size:.88rem;cursor:pointer;border:none" onclick="dp('+m.d.id+')">Supprimer</button></div>';
+  }
+  else if(m.t==="al"){
+    h='<div class="drag"></div><h2 style="font-size:1rem;font-weight:700;color:#1a3a2a;margin-bottom:1rem">Enregistrer un loyer</h2>';
+    // Selectionner bien si vient du global
+    if(!S.pid&&S.data.props.length>0){
+      h+='<div style="margin-bottom:.75rem"><span class="lbl">Bien *</span><select class="inp" id="f_pid">';
+      for(var i=0;i<S.data.props.length;i++){var p=S.data.props[i];h+='<option value="'+p.id+'">'+esc(p.nom)+'</option>';}
+      h+='</select></div>';
+    }
+    h+='<div style="display:flex;flex-direction:column;gap:.75rem">';
+    h+='<div><span class="lbl">Mois *</span><input class="inp" type="month" id="f_mois" value="'+new Date().toISOString().slice(0,7)+'"></div>';
+    h+='<div><span class="lbl">Montant verse * (euros)</span><input class="inp" type="number" id="f_mt" placeholder="0"'+(S.pid?' value="'+((S.data.props.find?S.data.props.find(function(p){return p.id===S.pid;}):null)||{loyer:0}).loyer+'"':"")+'></div>';
+    h+='<div><span class="lbl">Statut</span><select class="inp" id="f_st"><option value="paye">Paye</option><option value="attendu">Attendu</option><option value="retard">Retard</option><option value="impaye">Impaye</option></select></div>';
+    h+='<div><span class="lbl">Date de versement</span><input class="inp" type="date" id="f_dp" value="'+new Date().toISOString().slice(0,10)+'"></div>';
+    h+='<div><span class="lbl">Notes</span><textarea class="inp" id="f_nt" rows="2" placeholder="Ex: Paiement en 2 fois..."></textarea></div>';
+    h+='</div><div style="display:flex;gap:.65rem;margin-top:1.25rem"><button class="bs" onclick="cm()">Annuler</button><button class="bp" onclick="sl()" style="flex:2">Enregistrer</button></div>';
+  }
+  else if(m.t==="at"){
+    h='<div class="drag"></div><h2 style="font-size:1rem;font-weight:700;color:#1a3a2a;margin-bottom:1rem">Ajouter une intervention</h2>';
+    h+='<div style="display:flex;flex-direction:column;gap:.75rem">';
+    h+='<div><span class="lbl">Description *</span><input class="inp" id="f_desc" placeholder="Ex: Revision chaudiere"></div>';
+    h+='<div><span class="lbl">Categorie</span><select class="inp" id="f_ty"><option value="entretien">Entretien</option><option value="travaux">Travaux</option><option value="urgence">Urgence</option><option value="syndic">Syndic</option></select></div>';
+    h+='<div><span class="lbl">Cout * (euros)</span><input class="inp" type="number" id="f_mt" placeholder="0"></div>';
+    h+='<div><span class="lbl">Prestataire</span><input class="inp" id="f_pr" placeholder="Nom du prestataire"></div>';
+    h+='<div><span class="lbl">Date</span><input class="inp" type="date" id="f_dt" value="'+new Date().toISOString().slice(0,10)+'"></div>';
+    h+='<div><span class="lbl">Statut</span><select class="inp" id="f_st"><option value="planifie">Planifie</option><option value="encours">En cours</option><option value="termine">Termine</option></select></div>';
+    h+='</div><div style="display:flex;gap:.65rem;margin-top:1.25rem"><button class="bs" onclick="cm()">Annuler</button><button class="bp" onclick="stv()" style="flex:2">Enregistrer</button></div>';
+  }
+  else if(m.t==="ac"){
+    h='<div class="drag"></div><h2 style="font-size:1rem;font-weight:700;color:#1a3a2a;margin-bottom:1rem">Nouveau courrier</h2>';
+    h+='<div style="display:flex;flex-direction:column;gap:.75rem">';
+    h+='<div><span class="lbl">Titre *</span><input class="inp" id="f_ti" placeholder="Ex: Relance loyer juillet"></div>';
+    h+='<div><span class="lbl">Type</span><select class="inp" id="f_ty"><option value="relance">Relance</option><option value="miseendemeure">Mise en demeure</option><option value="commandement">Commandement</option><option value="conge">Conge</option><option value="autre">Autre</option></select></div>';
+    h+='<div><span class="lbl">Destinataire *</span><input class="inp" id="f_de" placeholder="Nom du destinataire"></div>';
+    h+='<div><span class="lbl">Notes / Suivi</span><textarea class="inp" id="f_nt" rows="2"></textarea></div>';
+    h+='</div><div style="display:flex;gap:.65rem;margin-top:1.25rem"><button class="bs" onclick="cm()">Annuler</button><button class="bp" onclick="scr()" style="flex:2">Enregistrer</button></div>';
+  }
+  else if(m.t==="am"){
+    h='<div class="drag"></div><h2 style="font-size:1rem;font-weight:700;color:#1a3a2a;margin-bottom:1rem">Rediger un mail</h2>';
+    h+='<div style="display:flex;flex-direction:column;gap:.75rem">';
+    h+='<div><span class="lbl">Objet *</span><input class="inp" id="f_ob" placeholder="Objet du mail"></div>';
+    h+='<div><span class="lbl">Destinataire *</span><input class="inp" id="f_a" placeholder="email@exemple.fr"></div>';
+    h+='<div><span class="lbl">Categorie</span><select class="inp" id="f_tg"><option value="loyer">Loyer</option><option value="travaux">Travaux</option><option value="syndic">Syndic</option><option value="autre">Autre</option></select></div>';
+    h+='<div><span class="lbl">Message *</span><textarea class="inp" id="f_cr" rows="5" placeholder="Votre message..."></textarea></div>';
+    h+='</div><div style="display:flex;gap:.65rem;margin-top:1.25rem"><button class="bs" onclick="cm()">Annuler</button><button class="bp" onclick="sml()" style="flex:2">Envoyer</button></div>';
+  }
+  else if(m.t==="ap"||m.t==="ep"){
+    var p=m.d||{};var ie=!!p.id;var loc=p.loc||{};var syn=p.syn||{};
+    h='<div class="drag"></div><h2 style="font-size:1rem;font-weight:700;color:#1a3a2a;margin-bottom:1rem">'+(ie?"Modifier":"Nouveau bien")+'</h2>';
+    h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">';
+    h+='<div style="grid-column:span 2"><span class="lbl">Nom *</span><input class="inp" id="f_nm" value="'+esc(p.nom||"")+'" placeholder="Ex: Appt Centre-Ville"></div>';
+    h+='<div style="grid-column:span 2"><span class="lbl">Adresse *</span><input class="inp" id="f_ad" value="'+esc(p.adr||"")+'" placeholder="Rue, CP, Ville"></div>';
+    h+='<div><span class="lbl">Type</span><select class="inp" id="f_ty"><option'+((!p.type||p.type==="Appartement")?" selected":"")+'>Appartement</option><option'+(p.type==="Studio"?" selected":"")+'>Studio</option><option'+(p.type==="Maison"?" selected":"")+'>Maison</option><option'+(p.type==="Commerce"?" selected":"")+'>Commerce</option><option'+(p.type==="Parking"?" selected":"")+'>Parking</option></select></div>';
+    h+='<div><span class="lbl">Surface (m2)</span><input class="inp" type="number" id="f_sr" value="'+(p.surf||"")+'"></div>';
+    h+='<div><span class="lbl">Loyer HC (euros)</span><input class="inp" type="number" id="f_ly" value="'+(p.loyer||"")+'"></div>';
+    h+='<div><span class="lbl">Charges (euros)</span><input class="inp" type="number" id="f_ch" value="'+(p.charges||"")+'"></div>';
+    h+='<div><span class="lbl">Caution (euros)</span><input class="inp" type="number" id="f_ca" value="'+(p.caution||"")+'"></div>';
+    h+='<div><span class="lbl">Statut</span><select class="inp" id="f_st"><option value="loue"'+(p.stat==="loue"?" selected":"")+'>Loue</option><option value="vacant"'+((!p.stat||p.stat==="vacant")?" selected":"")+'>Vacant</option><option value="travaux"'+(p.stat==="travaux"?" selected":"")+'>Travaux</option></select></div>';
+    h+='<div style="grid-column:span 2"><span class="lbl">Notes</span><textarea class="inp" id="f_nt" rows="2">'+esc(p.notes||"")+'</textarea></div>';
+    h+='</div>';
+    h+='<button class="mt" onclick="tg(\'sloc\')" id="btn_sloc"><span id="ar_sloc">'+(p.loc?"&#9660;":"&#9658;")+'</span> Locataire</button>';
+    h+='<div id="sloc" style="display:'+(p.loc?"block":"none")+'">';
+    h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.5rem">';
+    h+='<div style="grid-column:span 2"><span class="lbl">Nom complet</span><input class="inp" id="f_ln" value="'+esc(loc.nom||"")+'" placeholder="Prenom Nom"></div>';
+    h+='<div><span class="lbl">Email</span><input class="inp" type="email" id="f_le" value="'+esc(loc.email||"")+'" placeholder="email@..."></div>';
+    h+='<div><span class="lbl">Tel</span><input class="inp" id="f_lt" value="'+esc(loc.tel||"")+'" placeholder="06..."></div>';
+    h+='<div style="grid-column:span 2"><span class="lbl">Date entree</span><input class="inp" type="date" id="f_ld" value="'+(loc.date||"")+'"></div>';
+    h+='</div></div>';
+    h+='<button class="mt" onclick="tg(\'ssyn\')" id="btn_ssyn"><span id="ar_ssyn">'+(p.syn?"&#9660;":"&#9658;")+'</span> Syndic</button>';
+    h+='<div id="ssyn" style="display:'+(p.syn?"block":"none")+'">';
+    h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.5rem">';
+    h+='<div style="grid-column:span 2"><span class="lbl">Nom syndic</span><input class="inp" id="f_sn" value="'+esc(syn.nom||"")+'" placeholder="Nom du syndic"></div>';
+    h+='<div><span class="lbl">Email</span><input class="inp" id="f_sc" value="'+esc(syn.contact||"")+'" placeholder="email@..."></div>';
+    h+='<div><span class="lbl">Tel</span><input class="inp" id="f_st2" value="'+esc(syn.tel||"")+'" placeholder="01..."></div>';
+    h+='<div style="grid-column:span 2"><span class="lbl">Cotisation/mois (euros)</span><input class="inp" type="number" id="f_sco" value="'+(syn.cotis||"")+'"></div>';
+    h+='</div></div>';
+    h+='<div style="display:flex;gap:.65rem;margin-top:1.25rem"><button class="bs" onclick="cm()">Annuler</button><button class="bp" onclick="sp('+(ie?p.id:0)+')" style="flex:2">'+(ie?"Enregistrer":"Creer le bien")+'</button></div>';
+  }
+  else if(m.t==="charges"){
+    var pid=m.pid;var p=null;for(var i=0;i<S.data.props.length;i++){if(S.data.props[i].id===pid){p=S.data.props[i];break;}}
+    var annee=new Date().getFullYear();
+    var ch=null;for(var i=0;i<S.data.charges.length;i++){if(S.data.charges[i].pid===pid&&S.data.charges[i].annee===annee){ch=S.data.charges[i];break;}}
+    h='<div class="drag"></div><h2 style="font-size:1rem;font-weight:700;color:#1a3a2a;margin-bottom:1rem">Charges '+annee+(p?' - '+esc(p.nom):"")+'</h2>';
+    h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">';
+    h+='<div><span class="lbl">Eau (euros/an)</span><input class="inp" type="number" id="f_eau" value="'+(ch?ch.eau||"":"")+'" placeholder="0"></div>';
+    h+='<div><span class="lbl">Electricite (euros/an)</span><input class="inp" type="number" id="f_elec" value="'+(ch?ch.electricite||"":"")+'" placeholder="0"></div>';
+    h+='<div><span class="lbl">Assurance (euros/an)</span><input class="inp" type="number" id="f_ass" value="'+(ch?ch.assurance||"":"")+'" placeholder="0"></div>';
+    h+='<div><span class="lbl">Syndic (euros/an)</span><input class="inp" type="number" id="f_syn" value="'+(ch?ch.syndic||"":"")+'" placeholder="0"></div>';
+    h+='<div><span class="lbl">Copropriete (euros/an)</span><input class="inp" type="number" id="f_copro" value="'+(ch?ch.copro||"":"")+'" placeholder="0"></div>';
+    h+='<div><span class="lbl">Taxe fonciere (euros/an)</span><input class="inp" type="number" id="f_taxe" value="'+(ch?ch.taxe||"":"")+'" placeholder="0"></div>';
+    h+='</div>';
+    h+='<div style="display:flex;gap:.65rem;margin-top:1.25rem"><button class="bs" onclick="cm()">Annuler</button><button class="bp" onclick="scharges('+pid+','+annee+')" style="flex:2">Enregistrer</button></div>';
+  }
+  else if(m.t==="asp"||m.t==="esp"){
+    var p=m.d||{};var ie=!!p.id;
+    h='<div class="drag"></div><h2 style="font-size:1rem;font-weight:700;color:#1a3a2a;margin-bottom:1rem">'+(ie?"Modifier":"Nouveau bien saisonnier")+'</h2>';
+    h+='<div style="display:flex;flex-direction:column;gap:.75rem">';
+    h+='<div><span class="lbl">Nom *</span><input class="inp" id="f_nm" value="'+esc(p.nom||"")+'" placeholder="Ex: Villa Bord de Mer"></div>';
+    h+='<div><span class="lbl">Adresse *</span><input class="inp" id="f_ad" value="'+esc(p.adr||"")+'" placeholder="Adresse complete"></div>';
+    h+='<div><span class="lbl">Surface (m2)</span><input class="inp" type="number" id="f_sr" value="'+(p.surf||"")+'"></div>';
+    h+='<div><span class="lbl">Prix par nuit (euros)</span><input class="inp" type="number" id="f_pn" value="'+(p.prix_nuit||"")+'"></div>';
+    h+='<div><span class="lbl">Notes</span><textarea class="inp" id="f_nt" rows="2">'+esc(p.notes||"")+'</textarea></div>';
+    h+='</div><div style="display:flex;gap:.65rem;margin-top:1.25rem"><button class="bs" onclick="cm()">Annuler</button><button class="bp" onclick="ssp('+(ie?p.id:0)+')" style="flex:2">'+(ie?"Enregistrer":"Creer")+'</button></div>';
+  }
+  else if(m.t==="nres"){
+    h='<div class="drag"></div><h2 style="font-size:1rem;font-weight:700;color:#1a3a2a;margin-bottom:1rem">Nouvelle reservation</h2>';
+    h+='<div style="display:flex;flex-direction:column;gap:.75rem">';
+    h+='<div><span class="lbl">Nom du locataire *</span><input class="inp" id="f_nom" placeholder="Ex: Famille Martin"></div>';
+    h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">';
+    h+='<div><span class="lbl">Arrivee *</span><input class="inp" type="date" id="f_deb" value="'+(m.date||new Date().toISOString().slice(0,10))+'"></div>';
+    h+='<div><span class="lbl">Depart *</span><input class="inp" type="date" id="f_fin"></div>';
+    h+='</div>';
+    h+='<div><span class="lbl">Prix total (euros) *</span><input class="inp" type="number" id="f_prix" placeholder="0"></div>';
+    h+='<div><span class="lbl">Source</span><select class="inp" id="f_src"><option value="manuel">Manuel</option><option value="airbnb">Airbnb</option><option value="booking">Booking</option></select></div>';
+    h+='<div><span class="lbl">Couleur</span><div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.3rem">';
+    for(var i=0;i<COULEURS.length;i++){h+='<button onclick="selCol(this,\''+COULEURS[i]+'\')" data-col="'+COULEURS[i]+'" style="width:28px;height:28px;border-radius:50%;background:'+COULEURS[i]+';border:3px solid '+(i===0?"#333":"transparent")+';cursor:pointer"></button>';}
+    h+='</div></div>';
+    h+='</div><div style="display:flex;gap:.65rem;margin-top:1.25rem"><button class="bs" onclick="cm()">Annuler</button><button class="bp" onclick="snres()" style="flex:2">Enregistrer</button></div>';
+  }
+  else if(m.t==="sc"){
+    var pid=m.pid;var annee=m.annee;
+    var sp=null;for(var i=0;i<S.data.saisonnier.props.length;i++){if(S.data.saisonnier.props[i].id===pid){sp=S.data.saisonnier.props[i];break;}}
+    var ch=chargesAnnee(pid,annee)||{};
+    h='<div class="drag"></div><h2 style="font-size:1rem;font-weight:700;color:#1a3a2a;margin-bottom:1rem">Charges saisonniere '+annee+(sp?' - '+esc(sp.nom):"")+'</h2>';
+    h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">';
+    h+='<div><span class="lbl">Eau (euros/an)</span><input class="inp" type="number" id="f_eau" value="'+(ch.eau||"")+'"></div>';
+    h+='<div><span class="lbl">Electricite (euros/an)</span><input class="inp" type="number" id="f_elec" value="'+(ch.electricite||"")+'"></div>';
+    h+='<div><span class="lbl">Menage (euros/an)</span><input class="inp" type="number" id="f_men" value="'+(ch.menage||"")+'"></div>';
+    h+='<div><span class="lbl">Copropriete (euros/an)</span><input class="inp" type="number" id="f_copro" value="'+(ch.copro||"")+'"></div>';
+    h+='</div>';
+    h+='<div style="margin-top:.75rem"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem"><span class="lbl" style="margin:0">Charges diverses</span><button onclick="ajDivers()" style="background:#1a3a2a;color:#fff;padding:.25rem .6rem;border-radius:.5rem;font-size:.72rem;cursor:pointer">+ Ajouter</button></div>';
+    var divs=ch.divers||[];
+    for(var i=0;i<divs.length;i++){h+='<div style="display:grid;grid-template-columns:1fr auto;gap:.5rem;margin-bottom:.4rem"><input class="inp" id="f_dv_d'+i+'" value="'+esc(divs[i].desc||"")+'" placeholder="Description" style="font-size:.82rem"><input class="inp" type="number" id="f_dv_m'+i+'" value="'+(divs[i].mt||"")+'" placeholder="euros" style="font-size:.82rem;width:80px"></div>';}
+    h+='<div id="divers_container"></div></div>';
+    h+='<div style="display:flex;gap:.65rem;margin-top:1.25rem"><button class="bs" onclick="cm()">Annuler</button><button class="bp" onclick="ssc('+pid+','+annee+','+(divs.length)+')" style="flex:2">Enregistrer</button></div>';
+  }
+  else if(m.t==="ait"){
+    h='<div class="drag"></div><h2 style="font-size:1rem;font-weight:700;color:#1a3a2a;margin-bottom:1rem">&#129302; Triage IA</h2>';
+    h+='<p style="font-size:.85rem;color:#5a4e42;line-height:1.6;margin-bottom:1rem">Analyse votre boite mail et importe les emails immobiliers.</p>';
+    h+='<div style="background:#fffdf0;border:1px solid rgba(184,147,10,.3);border-radius:.65rem;padding:.85rem;margin-bottom:1rem;font-size:.78rem;color:#b8930a">Mode demo - voir documentation technique.</div>';
+    h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:1rem"><button onclick="ait(\'gmail\')" style="padding:.75rem;border-radius:.7rem;border:2px solid #ddd;background:#faf9f7;font-size:.85rem;cursor:pointer">Gmail</button><button onclick="ait(\'outlook\')" style="padding:.75rem;border-radius:.7rem;border:2px solid #ddd;background:#faf9f7;font-size:.85rem;cursor:pointer">Outlook</button><button onclick="ait(\'imap\')" style="padding:.75rem;border-radius:.7rem;border:2px solid #ddd;background:#faf9f7;font-size:.85rem;cursor:pointer">IMAP</button><button onclick="ait(\'yahoo\')" style="padding:.75rem;border-radius:.7rem;border:2px solid #ddd;background:#faf9f7;font-size:.85rem;cursor:pointer">Yahoo</button></div>';
+    h+='<button class="bs" onclick="cm()">Annuler</button>';
   }
 
-  else if(m.type==="confirmDelete"){
-    html=`<div class="drag"></div><h2 style="font-size:1rem;font-weight:700;color:#1a3a2a;margin-bottom:1rem">Supprimer ce bien ?</h2>
-    <p style="color:#5a4e42;font-size:.88rem;margin-bottom:1.25rem;line-height:1.6">Cette action est irréversible. <strong>${esc(m.payload.nom)}</strong> sera supprimé définitivement.</p>
-    <div style="display:flex;gap:.65rem"><button class="btn-secondary" onclick="closeModal()">Annuler</button><button style="flex:1;background:#c0392b;color:#fff;padding:.7rem;border-radius:.75rem;font-size:.88rem;cursor:pointer;border:none" onclick="deleteProp(${m.payload.id})">Supprimer</button></div>`;
-  }
-
-  else if(m.type==="addLoyer"){
-    html=`<div class="drag"></div><h2 style="font-size:1rem;font-weight:700;color:#1a3a2a;margin-bottom:1rem">Enregistrer un loyer</h2>
-    <div style="display:flex;flex-direction:column;gap:.75rem">
-      <div>${lbl("Mois *")}<input class="input" type="month" id="f_mois"></div>
-      <div>${lbl("Montant (€) *")}<input class="input" type="number" id="f_montant" placeholder="0"></div>
-      <div>${lbl("Statut")}<select class="input" id="f_statut"><option value="payé">Payé</option><option value="attendu">Attendu</option><option value="retard">En retard</option><option value="impayé">Impayé</option></select></div>
-      <div>${lbl("Date de paiement")}<input class="input" type="date" id="f_date"></div>
-      <div>${lbl("Notes")}<textarea class="input" id="f_notes" rows="2"></textarea></div>
-    </div>
-    <div style="display:flex;gap:.65rem;margin-top:1.25rem"><button class="btn-secondary" onclick="closeModal()">Annuler</button><button class="btn-primary" onclick="saveLoyer()" style="flex:2">Enregistrer</button></div>`;
-  }
-
-  else if(m.type==="addTravaux"){
-    html=`<div class="drag"></div><h2 style="font-size:1rem;font-weight:700;color:#1a3a2a;margin-bottom:1rem">Ajouter une intervention</h2>
-    <div style="display:flex;flex-direction:column;gap:.75rem">
-      <div>${lbl("Description *")}<input class="input" id="f_desc" placeholder="Ex: Révision chaudière"></div>
-      <div>${lbl("Catégorie")}<select class="input" id="f_type"><option value="entretien">Entretien</option><option value="travaux">Travaux</option><option value="urgence">Urgence</option><option value="syndic">Syndic</option></select></div>
-      <div>${lbl("Coût (€) *")}<input class="input" type="number" id="f_montant" placeholder="0"></div>
-      <div>${lbl("Prestataire")}<input class="input" id="f_presta" placeholder="Nom du prestataire"></div>
-      <div>${lbl("Date")}<input class="input" type="date" id="f_date" value="${new Date().toISOString().slice(0,10)}"></div>
-      <div>${lbl("Statut")}<select class="input" id="f_statut"><option value="planifié">Planifié</option><option value="en_cours">En cours</option><option value="terminé">Terminé</option></select></div>
-    </div>
-    <div style="display:flex;gap:.65rem;margin-top:1.25rem"><button class="btn-secondary" onclick="closeModal()">Annuler</button><button class="btn-primary" onclick="saveTravaux()" style="flex:2">Enregistrer</button></div>`;
-  }
-
-  else if(m.type==="addCourrier"){
-    html=`<div class="drag"></div><h2 style="font-size:1rem;font-weight:700;color:#1a3a2a;margin-bottom:1rem">Nouveau courrier / procédure</h2>
-    <div style="display:flex;flex-direction:column;gap:.75rem">
-      <div>${lbl("Titre *")}<input class="input" id="f_titre" placeholder="Ex: Relance loyer juillet"></div>
-      <div>${lbl("Type")}<select class="input" id="f_type"><option value="relance">Relance</option><option value="mise_en_demeure">Mise en demeure</option><option value="commandement">Commandement de payer</option><option value="congé">Congé donné</option><option value="autre">Autre</option></select></div>
-      <div>${lbl("Destinataire *")}<input class="input" id="f_dest" placeholder="Nom du destinataire"></div>
-      <div>${lbl("Statut")}<select class="input" id="f_statut"><option value="planifié">Planifié</option><option value="envoyé">Envoyé</option><option value="en_cours">En cours</option><option value="classé">Classé</option></select></div>
-      <div>${lbl("Notes / Suivi")}<textarea class="input" id="f_notes" rows="2"></textarea></div>
-    </div>
-    <div style="display:flex;gap:.65rem;margin-top:1.25rem"><button class="btn-secondary" onclick="closeModal()">Annuler</button><button class="btn-primary" onclick="saveCourrier()" style="flex:2">Enregistrer</button></div>`;
-  }
-
-  else if(m.type==="addMail"){
-    html=`<div class="drag"></div><h2 style="font-size:1rem;font-weight:700;color:#1a3a2a;margin-bottom:1rem">Rédiger un mail</h2>
-    <div style="display:flex;flex-direction:column;gap:.75rem">
-      <div>${lbl("Objet *")}<input class="input" id="f_objet" placeholder="Objet du mail"></div>
-      <div>${lbl("Destinataire *")}<input class="input" id="f_a" placeholder="email@exemple.fr"></div>
-      <div>${lbl("Catégorie")}<select class="input" id="f_tag"><option value="loyer">Loyer</option><option value="travaux">Travaux</option><option value="syndic">Syndic</option><option value="procédure">Procédure</option><option value="autre">Autre</option></select></div>
-      <div>${lbl("Message *")}<textarea class="input" id="f_corps" rows="5" placeholder="Votre message..."></textarea></div>
-    </div>
-    <div style="display:flex;gap:.65rem;margin-top:1.25rem"><button class="btn-secondary" onclick="closeModal()">Annuler</button><button class="btn-primary" onclick="saveMail()" style="flex:2">Envoyer</button></div>`;
-  }
-
-  else if(m.type==="addProp"||m.type==="editProp"){
-    const p=m.payload||{};
-    const isEdit=!!p.id;
-    const loc=p.locataire||{};
-    const syn=p.syndic||{};
-    html=`<div class="drag"></div><h2 style="font-size:1rem;font-weight:700;color:#1a3a2a;margin-bottom:1rem">${isEdit?"Modifier le bien":"Nouveau bien"}</h2>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">
-      <div style="grid-column:span 2">${lbl("Nom *")}<input class="input" id="f_nom" value="${esc(p.nom||"")}" placeholder="Ex: Appt Centre-Ville"></div>
-      <div style="grid-column:span 2">${lbl("Adresse *")}<input class="input" id="f_adresse" value="${esc(p.adresse||"")}" placeholder="Rue, CP, Ville"></div>
-      <div>${lbl("Type")}<select class="input" id="f_type"><option${!p.type||p.type==="Appartement"?" selected":""}>Appartement</option><option${p.type==="Studio"?" selected":""}>Studio</option><option${p.type==="Maison"?" selected":""}>Maison</option><option${p.type==="Commerce"?" selected":""}>Commerce</option><option${p.type==="Parking"?" selected":""}>Parking</option></select></div>
-      <div>${lbl("Surface (m²)")}<input class="input" type="number" id="f_surface" value="${p.surface||""}"></div>
-      <div>${lbl("Loyer HC (€/mois)")}<input class="input" type="number" id="f_loyer" value="${p.loyer||""}"></div>
-      <div>${lbl("Charges (€/mois)")}<input class="input" type="number" id="f_charges" value="${p.charges||""}"></div>
-      <div>${lbl("Caution (€)")}<input class="input" type="number" id="f_caution" value="${p.caution||""}"></div>
-      <div>${lbl("Statut")}<select class="input" id="f_statut"><option value="loué"${p.statut==="loué"?" selected":""}>Loué</option><option value="vacant"${!p.statut||p.statut==="vacant"?" selected":""}>Vacant</option><option value="travaux"${p.statut==="travaux"?" selected":""}>Travaux</option></select></div>
-      <div style="grid-column:span 2">${lbl("Notes")}<textarea class="input" id="f_notes" rows="2">${esc(p.notes||"")}</textarea></div>
-    </div>
-
-    <button class="sec-toggle" onclick="toggleSection('sec_loc')">
-      <span id="sec_loc_arrow">${p.locataire?"▼":"►"}</span> 👤 Locataire
-    </button>
-    <div id="sec_loc" style="display:${p.locataire?"block":"none"}">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.5rem">
-        <div style="grid-column:span 2">${lbl("Nom complet")}<input class="input" id="f_loc_nom" value="${esc(loc.nom||"")}" placeholder="Prénom Nom"></div>
-        <div>${lbl("Email")}<input class="input" type="email" id="f_loc_email" value="${esc(loc.email||"")}" placeholder="email@..."></div>
-        <div>${lbl("Téléphone")}<input class="input" id="f_loc_tel" value="${esc(loc.tel||"")}" placeholder="06..."></div>
-        <div style="grid-column:span 2">${lbl("Date d'entrée")}<input class="input" type="date" id="f_loc_date" value="${loc.dateEntree||""}"></div>
-      </div>
-    </div>
-
-    <button class="sec-toggle" onclick="toggleSection('sec_syn')">
-      <span id="sec_syn_arrow">${p.syndic?"▼":"►"}</span> 🏢 Syndic / Gestionnaire
-    </button>
-    <div id="sec_syn" style="display:${p.syndic?"block":"none"}">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.5rem">
-        <div style="grid-column:span 2">${lbl("Nom du syndic")}<input class="input" id="f_syn_nom" value="${esc(syn.nom||"")}" placeholder="Nom du syndic"></div>
-        <div>${lbl("Email contact")}<input class="input" id="f_syn_contact" value="${esc(syn.contact||"")}" placeholder="email@..."></div>
-        <div>${lbl("Téléphone")}<input class="input" id="f_syn_tel" value="${esc(syn.tel||"")}" placeholder="01..."></div>
-        <div style="grid-column:span 2">${lbl("Cotisation (€/mois)")}<input class="input" type="number" id="f_syn_cotisation" value="${syn.cotisation||""}"></div>
-      </div>
-    </div>
-
-    <div style="display:flex;gap:.65rem;margin-top:1.25rem">
-      <button class="btn-secondary" onclick="closeModal()">Annuler</button>
-      <button class="btn-primary" onclick="saveProp(${isEdit?p.id:0})" style="flex:2">${isEdit?"Enregistrer":"Créer le bien"}</button>
-    </div>`;
-  }
-
-  else if(m.type==="aiTriage"){
-    html=`<div class="drag"></div><h2 style="font-size:1rem;font-weight:700;color:#1a3a2a;margin-bottom:1rem">🤖 Triage IA — Boîte mail</h2>
-    <p style="font-size:.85rem;color:#5a4e42;line-height:1.6;margin-bottom:1rem">L'IA analyse votre boîte mail et importe automatiquement les emails immobiliers classés par bien.</p>
-    <div style="background:#fffdf0;border:1px solid rgba(184,147,10,.3);border-radius:.65rem;padding:.85rem;margin-bottom:1rem;font-size:.78rem;color:#b8930a">⚠️ Mode démo — voir la documentation technique pour la connexion réelle à Gmail/Outlook.</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:1rem">
-      ${[["gmail","📧 Gmail"],["outlook","📬 Outlook"],["imap","🖥️ IMAP"],["yahoo","📮 Yahoo"]].map(([v,l])=>`<button onclick="startAITriage('${v}')" style="padding:.75rem;border-radius:.7rem;border:2px solid #ddd8cf;background:#faf9f7;font-size:.85rem;color:#5a4e42;cursor:pointer;font-family:Georgia,serif">${l}</button>`).join("")}
-    </div>
-    <div style="display:flex;gap:.65rem"><button class="btn-secondary" onclick="closeModal()">Annuler</button></div>`;
-  }
-
-  const overlay=document.createElement("div");
-  overlay.className="overlay";
-  overlay.id="modalOverlay";
-  overlay.onclick=function(e){if(e.target===this)closeModal();};
-  const sheet=document.createElement("div");
-  sheet.className="sheet";
-  sheet.innerHTML=html;
-  overlay.appendChild(sheet);
-  document.body.appendChild(overlay);
+  var ov=document.createElement("div");ov.className="ovl";ov.id="mo";
+  ov.onclick=function(e){if(e.target===this)cm();};
+  var sh=document.createElement("div");sh.className="sht";sh.innerHTML=h;
+  ov.appendChild(sh);document.body.appendChild(ov);
 }
 
 // ── ACTIONS ──
-function goNav(v){state.nav=v;if(v!=="detail"&&v!=="more")state.propId=null;render();}
-function goDetail(id,t){state.propId=id;state.tab=t||"loyers";state.nav="detail";render();}
-function setTab(t){state.tab=t;render();}
-function openModal(t){state.modal={type:t};renderModal();}
-function closeModal(){state.modal=null;renderModal();}
-function openAddProp(){state.modal={type:"addProp",payload:{}};renderModal();}
-function openEditProp(id,section){
-  const p=state.data.properties.find(x=>x.id===id);
-  state.modal={type:"editProp",payload:p};
-  renderModal();
-  if(section==="loc"){setTimeout(()=>toggleSection("sec_loc"),100);}
-  if(section==="syn"){setTimeout(()=>toggleSection("sec_syn"),100);}
+function gn(v){S.nav=v;if(v!=="det"&&v!=="sdet")S.pid=null;render();}
+function gd(id,t){S.pid=id;S.tab=t||"loyers";S.nav="det";render();}
+function gsd(id){S.spid=id;S.tab="scalendrier";S.nav="sdet";render();}
+function st(t){S.tab=t;render();}
+function om(t,d){S.modal={t:t,d:d};renderM();}
+function cm(){S.modal=null;renderM();}
+function opAP(){S.modal={t:"ap",d:{}};renderM();}
+function opEP(id,sec){var p=null;for(var i=0;i<S.data.props.length;i++){if(S.data.props[i].id===id){p=S.data.props[i];break;}}S.modal={t:"ep",d:p};renderM();if(sec===1){setTimeout(function(){tg("sloc");},50);}if(sec===2){setTimeout(function(){tg("ssyn");},50);}}
+function opCharges(pid){S.modal={t:"charges",pid:pid};renderM();}
+function opSC(pid,annee){S.modal={t:"sc",pid:pid,annee:annee};renderM();}
+function opNR(date){S.modal={t:"nres",date:date};renderM();}
+function tg(id){var el=document.getElementById(id);var ar=document.getElementById("ar_"+id);if(!el)return;var op=el.style.display==="none";el.style.display=op?"block":"none";if(ar)ar.innerHTML=op?"&#9660;":"&#9658;";}
+function calNav(dir){S.scal.mois+=dir;if(S.scal.mois>11){S.scal.mois=0;S.scal.annee++;}if(S.scal.mois<0){S.scal.mois=11;S.scal.annee--;}render();}
+function selCol(btn,col){var btns=document.querySelectorAll("[data-col]");for(var i=0;i<btns.length;i++)btns[i].style.border="3px solid transparent";btn.style.border="3px solid #333";btn.setAttribute("data-selected","1");}
+function getSelCol(){var btns=document.querySelectorAll("[data-col]");for(var i=0;i<btns.length;i++){if(btns[i].getAttribute("data-selected"))return btns[i].getAttribute("data-col");}return COULEURS[0];}
+function ajDivers(){var c=document.getElementById("divers_container");if(!c)return;var i=c.children.length;var d=document.createElement("div");d.style.cssText="display:grid;grid-template-columns:1fr auto;gap:.5rem;margin-bottom:.4rem";d.innerHTML='<input class="inp" id="f_dv_d_new'+i+'" placeholder="Description" style="font-size:.82rem"><input class="inp" type="number" id="f_dv_m_new'+i+'" placeholder="euros" style="font-size:.82rem;width:80px">';c.appendChild(d);}
+
+function vm(id){
+  var ml=null;for(var i=0;i<S.data.mails.length;i++){if(S.data.mails[i].id===id){ml=S.data.mails[i];break;}}
+  if(!ml)return;
+  for(var i=0;i<S.data.mails.length;i++){if(S.data.mails[i].id===id)S.data.mails[i].lu=true;}
+  saveD();S.modal={t:"vm",d:Object.assign({},ml,{lu:true})};renderM();
 }
-function openAddTravaux(pid){state.propId=pid;state.modal={type:"addTravaux"};renderModal();}
-function openAddCourrier(pid){state.propId=pid;state.modal={type:"addCourrier"};renderModal();}
-function openAddMail(pid){state.propId=pid;state.modal={type:"addMail"};renderModal();}
-
-function toggleSection(id){
-  const el=document.getElementById(id);
-  const arrow=document.getElementById(id+"_arrow");
-  if(!el)return;
-  const open=el.style.display==="none";
-  el.style.display=open?"block":"none";
-  if(arrow)arrow.textContent=open?"▼":"►";
+function cdel(id){var p=null;for(var i=0;i<S.data.props.length;i++){if(S.data.props[i].id===id){p=S.data.props[i];break;}}if(p){S.modal={t:"cd",d:p};renderM();}}
+function dp(id){
+  S.data.props=S.data.props.filter(function(p){return p.id!==id;});
+  S.data.loyers=S.data.loyers.filter(function(l){return l.pid!==id;});
+  S.data.travaux=S.data.travaux.filter(function(t){return t.pid!==id;});
+  S.data.courriers=S.data.courriers.filter(function(c){return c.pid!==id;});
+  S.data.mails=S.data.mails.filter(function(m){return m.pid!==id;});
+  S.data.charges=S.data.charges.filter(function(c){return c.pid!==id;});
+  saveD();cm();S.nav="biens";S.pid=null;render();
 }
-
-function viewMail(id){
-  const m=state.data.mails.find(x=>x.id===id);
-  if(!m)return;
-  state.data.mails=state.data.mails.map(x=>x.id===id?{...x,lu:true}:x);
-  saveData();
-  state.modal={type:"viewMail",payload:{...m,lu:true}};
-  renderModal();
-}
-
-function confirmDelete(id){
-  const p=state.data.properties.find(x=>x.id===id);
-  if(p){state.modal={type:"confirmDelete",payload:p};renderModal();}
-}
-
-function deleteProp(id){
-  state.data.properties=state.data.properties.filter(p=>p.id!==id);
-  state.data.loyers=state.data.loyers.filter(l=>l.propId!==id);
-  state.data.travaux=state.data.travaux.filter(t=>t.propId!==id);
-  state.data.courriers=state.data.courriers.filter(c=>c.propId!==id);
-  state.data.mails=state.data.mails.filter(m=>m.propId!==id);
-  saveData();closeModal();state.nav="biens";state.propId=null;render();
-}
-
-function changeStatut(s){
-  state.data.properties=state.data.properties.map(p=>p.id===state.propId?{...p,statut:s}:p);
-  saveData();render();
-}
-
-function updateLoyerStatut(id,statut){
-  state.data.loyers=state.data.loyers.map(l=>l.id===id?{...l,statut,datePaiement:statut==="payé"?new Date().toISOString().slice(0,10):l.datePaiement}:l);
-  saveData();render();
-}
-
-function updateCourrierStatut(id,statut){
-  state.data.courriers=state.data.courriers.map(c=>c.id===id?{...c,statut}:c);
-  saveData();render();
-}
-
-function saveLoyer(){
-  const mois=gv("f_mois");const montant=gv("f_montant");
-  if(!mois||!montant)return alert("Veuillez remplir les champs obligatoires.");
-  state.data.loyers.push({id:Date.now(),propId:state.propId,mois,montant:+montant,statut:gv("f_statut")||"payé",datePaiement:gv("f_date"),notes:gv("f_notes")});
-  saveData();closeModal();render();
-}
-
-function saveTravaux(){
-  const desc=gv("f_desc");const montant=gv("f_montant");
-  if(!desc||!montant)return alert("Veuillez remplir les champs obligatoires.");
-  state.data.travaux.push({id:Date.now(),propId:state.propId,desc,type:gv("f_type")||"entretien",montant:+montant,prestataire:gv("f_presta"),date:gv("f_date")||new Date().toISOString().slice(0,10),statut:gv("f_statut")||"terminé"});
-  saveData();closeModal();render();
-}
-
-function saveCourrier(){
-  const titre=gv("f_titre");const dest=gv("f_dest");
-  if(!titre||!dest)return alert("Veuillez remplir les champs obligatoires.");
-  state.data.courriers.push({id:Date.now(),propId:state.propId,titre,type:gv("f_type")||"relance",destinataire:dest,statut:gv("f_statut")||"envoyé",notes:gv("f_notes"),date:new Date().toISOString().slice(0,10)});
-  saveData();closeModal();render();
-}
-
-function saveMail(){
-  const objet=gv("f_objet");const a=gv("f_a");const corps=gv("f_corps");
-  if(!objet||!a||!corps)return alert("Veuillez remplir les champs obligatoires.");
-  state.data.mails.push({id:Date.now(),propId:state.propId,objet,a,corps,de:"moi",date:new Date().toISOString().slice(0,10),tag:gv("f_tag")||"autre",lu:true,aiTriage:false});
-  saveData();closeModal();render();
-}
-
-function saveProp(editId){
-  const nom=gv("f_nom");const adresse=gv("f_adresse");
-  if(!nom||!adresse)return alert("Veuillez remplir le nom et l'adresse.");
-
-  // Locataire
-  const locNom=gv("f_loc_nom");
-  const loc=locNom?{nom:locNom,email:gv("f_loc_email"),tel:gv("f_loc_tel"),dateEntree:gv("f_loc_date")}:null;
-
-  // Syndic
-  const synNom=gv("f_syn_nom");
-  const syn=synNom?{nom:synNom,contact:gv("f_syn_contact"),tel:gv("f_syn_tel"),cotisation:+gv("f_syn_cotisation")||0}:null;
-
-  const p={
-    id:editId||Date.now(),nom,adresse,
-    type:gv("f_type")||"Appartement",
-    surface:+gv("f_surface")||0,
-    loyer:+gv("f_loyer")||0,
-    charges:+gv("f_charges")||0,
-    caution:+gv("f_caution")||0,
-    statut:gv("f_statut")||"vacant",
-    notes:gv("f_notes"),
-    image:editId?state.data.properties.find(x=>x.id===editId)?.image||"🏠":"🏠",
-    locataire:loc,syndic:syn
-  };
-
-  if(editId){state.data.properties=state.data.properties.map(x=>x.id===editId?p:x);}
-  else{state.data.properties.push(p);}
-  saveData();closeModal();
-  if(editId&&state.nav==="detail"){state.propId=editId;}
-  render();
-}
-
-function startAITriage(src){
-  closeModal();
-  const propId=state.data.properties.length>0?state.data.properties[0].id:null;
-  const now=new Date().toISOString().slice(0,10);
-  const fakeEmails=[
-    {id:Date.now(),propId,date:now,objet:"Question sur les charges — "+src,de:"locataire@email.fr",a:"moi",corps:"Bonjour,\n\nJe souhaitais avoir des précisions sur le montant des charges ce mois-ci.\n\nCordialement",tag:"loyer",lu:false,aiTriage:true},
-    {id:Date.now()+1,propId,date:now,objet:"Convocation Assemblée Générale",de:"syndic@immobilier.fr",a:"moi",corps:"Madame, Monsieur,\n\nVous êtes convoqué à l'assemblée générale annuelle le 15 novembre.\n\nLe Syndic",tag:"syndic",lu:false,aiTriage:true},
-    {id:Date.now()+2,propId,date:now,objet:"Devis travaux plomberie",de:"plombier@gmail.com",a:"moi",corps:"Bonjour,\n\nSuite à votre demande, je vous adresse le devis pour la réparation.\n\nCordialement",tag:"travaux",lu:false,aiTriage:true},
-  ];
-  fakeEmails.forEach(m=>state.data.mails.push(m));
-  saveData();
-  alert(`✅ ${fakeEmails.length} emails importés par l'IA !`);
-  render();
-}
-
-function resetData(){
-  if(confirm("Réinitialiser toutes les données ? Cette action est irréversible.")){
-    localStorage.removeItem(STORAGE_KEY);
-    state.data=JSON.parse(JSON.stringify(DEFAULT_DATA));
-    saveData();render();
+function chSt(s){for(var i=0;i<S.data.props.length;i++){if(S.data.props[i].id===S.pid)S.data.props[i].stat=s;}saveD();render();}
+function ulS(id,stat){
+  for(var i=0;i<S.data.loyers.length;i++){
+    if(S.data.loyers[i].id===id){
+      S.data.loyers[i].stat=stat;
+      if(stat==="paye")S.data.loyers[i].dp=new Date().toISOString().slice(0,10);
+      break;
+    }
   }
+  saveD();render();
+}
+function ucS(id,stat){for(var i=0;i<S.data.courriers.length;i++){if(S.data.courriers[i].id===id){S.data.courriers[i].stat=stat;break;}}saveD();render();}
+function delRes(id){
+  if(!confirm("Supprimer cette reservation ?"))return;
+  S.data.saisonnier.reservations=S.data.saisonnier.reservations.filter(function(r){return r.id!==id;});
+  saveD();render();
 }
 
-// ── EVENT LISTENERS ──
-document.getElementById("backBtn").addEventListener("click",()=>{
-  if(state.nav==="detail"){state.nav="biens";state.propId=null;}
-  else{state.nav="dashboard";}
+function sl(){
+  var mois=gv("f_mois");var mt=gv("f_mt");
+  if(!mois||!mt){alert("Remplir mois et montant");return;}
+  var pid=S.pid;
+  if(!pid){var el=document.getElementById("f_pid");if(el)pid=+el.value;}
+  if(!pid){alert("Selectionner un bien");return;}
+  S.data.loyers.push({id:Date.now(),pid:pid,mois:mois,mt:+mt,stat:gv("f_st")||"paye",dp:gv("f_dp"),notes:gv("f_nt")});
+  saveD();cm();render();
+}
+function stv(){
+  var desc=gv("f_desc");var mt=gv("f_mt");
+  if(!desc||!mt){alert("Remplir description et cout");return;}
+  S.data.travaux.push({id:Date.now(),pid:S.pid,desc:desc,type:gv("f_ty")||"entretien",mt:+mt,prest:gv("f_pr"),date:gv("f_dt")||new Date().toISOString().slice(0,10),stat:gv("f_st")||"termine"});
+  saveD();cm();render();
+}
+function scr(){
+  var ti=gv("f_ti");var de=gv("f_de");
+  if(!ti||!de){alert("Remplir titre et destinataire");return;}
+  S.data.courriers.push({id:Date.now(),pid:S.pid,titre:ti,type:gv("f_ty")||"relance",dest:de,stat:"envoye",notes:gv("f_nt"),date:new Date().toISOString().slice(0,10)});
+  saveD();cm();render();
+}
+function sml(){
+  var ob=gv("f_ob");var a=gv("f_a");var cr=gv("f_cr");
+  if(!ob||!a||!cr){alert("Remplir tous les champs");return;}
+  S.data.mails.push({id:Date.now(),pid:S.pid,obj:ob,a:a,corps:cr,de:"moi",date:new Date().toISOString().slice(0,10),tag:gv("f_tg")||"autre",lu:true,ia:false});
+  saveD();cm();render();
+}
+function sp(eid){
+  var nm=gv("f_nm");var ad=gv("f_ad");
+  if(!nm||!ad){alert("Remplir nom et adresse");return;}
+  var ln=gv("f_ln");var loc=ln?{nom:ln,email:gv("f_le"),tel:gv("f_lt"),date:gv("f_ld")}:null;
+  var sn=gv("f_sn");var syn=sn?{nom:sn,contact:gv("f_sc"),tel:gv("f_st2"),cotis:+gv("f_sco")||0}:null;
+  var np={id:eid||Date.now(),nom:nm,adr:ad,type:gv("f_ty")||"Appartement",surf:+gv("f_sr")||0,loyer:+gv("f_ly")||0,charges:+gv("f_ch")||0,caution:+gv("f_ca")||0,stat:gv("f_st")||"vacant",notes:gv("f_nt"),img:"AP",loc:loc,syn:syn};
+  if(eid){for(var i=0;i<S.data.props.length;i++){if(S.data.props[i].id===eid){np.img=S.data.props[i].img;S.data.props[i]=np;break;}}}
+  else S.data.props.push(np);
+  saveD();cm();if(eid&&S.nav==="det")S.pid=eid;render();
+}
+function scharges(pid,annee){
+  var nc={pid:pid,annee:annee,eau:+gv("f_eau")||0,electricite:+gv("f_elec")||0,assurance:+gv("f_ass")||0,syndic:+gv("f_syn")||0,copro:+gv("f_copro")||0,taxe:+gv("f_taxe")||0};
+  var found=false;
+  for(var i=0;i<S.data.charges.length;i++){if(S.data.charges[i].pid===pid&&S.data.charges[i].annee===annee){S.data.charges[i]=nc;found=true;break;}}
+  if(!found)S.data.charges.push(nc);
+  saveD();cm();render();
+}
+function ssp(eid){
+  var nm=gv("f_nm");var ad=gv("f_ad");
+  if(!nm||!ad){alert("Remplir nom et adresse");return;}
+  var np={id:eid||Date.now(),nom:nm,adr:ad,surf:+gv("f_sr")||0,prix_nuit:+gv("f_pn")||0,notes:gv("f_nt"),img:"VL"};
+  if(eid){for(var i=0;i<S.data.saisonnier.props.length;i++){if(S.data.saisonnier.props[i].id===eid){S.data.saisonnier.props[i]=np;break;}}}
+  else S.data.saisonnier.props.push(np);
+  saveD();cm();if(eid&&S.nav==="sdet")S.spid=eid;render();
+}
+function snres(){
+  var nom=gv("f_nom");var deb=gv("f_deb");var fin=gv("f_fin");var prix=gv("f_prix");
+  if(!nom||!deb||!fin||!prix){alert("Remplir tous les champs obligatoires");return;}
+  if(fin<=deb){alert("La date de depart doit etre apres l arrivee");return;}
+  S.data.saisonnier.reservations.push({id:Date.now(),pid:S.spid,debut:deb,fin:fin,nom:nom,couleur:getSelCol(),prix:+prix,source:gv("f_src")||"manuel"});
+  saveD();cm();render();
+}
+function ssc(pid,annee,nbExisting){
+  var ch=chargesAnnee(pid,annee)||{};
+  var nc={pid:pid,annee:annee,eau:+gv("f_eau")||0,electricite:+gv("f_elec")||0,menage:+gv("f_men")||0,copro:+gv("f_copro")||0,divers:ch.divers||[]};
+  // Existants
+  for(var i=0;i<nbExisting;i++){
+    var d=gv("f_dv_d"+i);var mv=gv("f_dv_m"+i);
+    if(d)nc.divers[i]={desc:d,mt:+mv||0};
+  }
+  // Nouveaux
+  var c=document.getElementById("divers_container");
+  if(c){var nd=c.children.length;for(var i=0;i<nd;i++){var d=gv("f_dv_d_new"+i);var mv=gv("f_dv_m_new"+i);if(d)nc.divers.push({desc:d,mt:+mv||0});}}
+  var found=false;
+  for(var i=0;i<S.data.saisonnier.charges.length;i++){if(S.data.saisonnier.charges[i].pid===pid&&S.data.saisonnier.charges[i].annee===annee){S.data.saisonnier.charges[i]=nc;found=true;break;}}
+  if(!found)S.data.saisonnier.charges.push(nc);
+  saveD();cm();render();
+}
+function ait(src){
+  cm();
+  var pid=S.data.props.length>0?S.data.props[0].id:null;
+  var now=new Date().toISOString().slice(0,10);
+  S.data.mails.push({id:Date.now(),pid:pid,date:now,obj:"Question charges - "+src,de:"locataire@email.fr",a:"moi",corps:"Bonjour,\n\nDes precisions sur les charges svp.\n\nCordialement",tag:"loyer",lu:false,ia:true});
+  S.data.mails.push({id:Date.now()+1,pid:pid,date:now,obj:"Convocation AG",de:"syndic@immo.fr",a:"moi",corps:"Vous etes convoque a l AG annuelle.\n\nLe Syndic",tag:"syndic",lu:false,ia:true});
+  saveD();alert("2 emails importes !");render();
+}
+function rst(){if(confirm("Reinitialiser toutes les donnees ?")){localStorage.removeItem(SK);S.data=JSON.parse(JSON.stringify(DEF));saveD();render();}}
+
+document.getElementById("backBtn").addEventListener("click",function(){
+  if(S.nav==="det"){S.nav="biens";S.pid=null;}
+  else if(S.nav==="sdet"){S.nav="sais";S.spid=null;}
+  else S.nav="db";
   render();
 });
-document.getElementById("aiBtn").addEventListener("click",()=>{state.modal={type:"aiTriage"};renderModal();});
-document.getElementById("addPropBtn").addEventListener("click",()=>openAddProp());
+document.getElementById("aiBtn").addEventListener("click",function(){S.modal={t:"ait"};renderM();});
+document.getElementById("addBtn").addEventListener("click",function(){opAP();});
 
 render();
 </script>
